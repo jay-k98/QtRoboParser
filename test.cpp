@@ -80,20 +80,4 @@ int main() {
             exit(1);
         }
     }
-
-    // read and print data from connected socket
-    //printf("waiting to read...\n");
-    //bytes_rec = recv(m_socket, buf, sizeof(buf), 0);
-    //while (true){
-        //if (bytes_rec == -1){
-            //printf("RECV ERROR: %d\n");
-            //printf("error");
-            //printf(strerror(errno));
-            //close(m_socket);
-            //exit(1);
-        //}
-        //else {
-            //printf("DATA RECEIVED = %s\n", buf);
-        //}
-    //}
 }
