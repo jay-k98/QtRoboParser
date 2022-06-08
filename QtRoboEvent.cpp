@@ -1,7 +1,7 @@
 #include <QtRoboEvent.h>
 
-QtRoboEvent::QtRoboEvent(int channel, int value) : 
-    eventChannel{channel}, eventValue{value}
+QtRoboEvent::QtRoboEvent(uint8_t channel, uint8_t value) : 
+    mEventChannel{channel}, mEventValue{value}
 {
 
 }
