@@ -2,6 +2,7 @@
 #include <Parser.h>
 #include <ctype.h>
 #include <iostream>
+#include <bitset>
 
 using namespace std;
 
@@ -41,14 +42,27 @@ QtRoboEvent Parser::parseToQtRoboEvent() {
 
 
 uint8_t* Parser::parseToSumd(QtRoboEvent event) {
-    uint8_t sumdHeader[3];
-    uint8_t sumdData[2];
-    uint8_t sumdCrc[2];
-    sumdHeader[0] = 0xA8;
-    sumdHeader[1] = 0x01;
-    sumdHeader[2] = 0x01;
-    sumdData[0] = event.eventChannel();
-    sumdData[1] = event.eventValue();
+    static uint8_t sumd[9];
+    // header
+    sumd[0] = 0xA8;
+    sumd[1] = 0x01;
+    sumd[2] = 0x02; // 2 channels one for eventChannel, other for eventValue
+    // data
+    uint8_t* channelData {splitUint16ToUint8(event.eventChannel())};
+    uint8_t* valueData {splitUint16ToUint8(event.eventValue())};
+    sumd[3] = *channelData;
+    channelData++;
+    sumd[4] = *channelData;
+    sumd[5] = *valueData;
+    valueData++;
+    sumd[6] = *valueData;
+    // crc - 42 as placeholder
+    uint16_t crc {crc16(42, 42)};
+    uint8_t* crcSumd {splitUint16ToUint8(crc)};
+    sumd[7] = *crcSumd;
+    crcSumd++;
+    sumd[8] = *crcSumd;
+    return sumd;
 }
 
 int charToInt(char c) {
@@ -66,4 +80,22 @@ uint16_t crc16(uint16_t crc, uint8_t value) {
             crc = crc << 1;
     }
     return crc;
+}
+
+uint8_t* splitUint16ToUint8(uint16_t value) {
+    static uint8_t bytes[2];
+    bytes[0] = *((uint8_t*) & (value)+1); // high byte
+    bytes[1] = *((uint8_t*) & (value)+0); // low byte
+    return bytes;
+}
+
+string sumdBytesToString(uint8_t* sumd) {
+    string out {""};
+    uint8_t *b = sumd;
+    for(int i {0}; i < 9; i++) {
+        bitset<8> bits(*b);
+        out += bits.to_string();
+        b++;
+    }
+    return out;
 }
