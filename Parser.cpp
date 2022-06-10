@@ -1,8 +1,8 @@
  
 #include <Parser.h>
+#include "Util.h"
 #include <ctype.h>
 #include <iostream>
-#include <bitset>
 
 using namespace std;
 
@@ -22,14 +22,14 @@ QtRoboEvent Parser::parseToQtRoboEvent() {
                 break;
             case channel:
                 if (isdigit(*c)) {
-                    eventChannel = eventChannel * base10 + charToInt(*c);
+                    eventChannel = eventChannel * base10 + Util::charToInt(*c);
                 }
                 if (*c == ':')
                     currentState = value;
                 break;
             case value:
                 if (isdigit(*c)) {
-                    eventValue = eventValue * base10 + charToInt(*c);
+                    eventValue = eventValue * base10 + Util::charToInt(*c);
                 }
                 break;
         }
@@ -48,8 +48,8 @@ uint8_t* Parser::parseToSumd(QtRoboEvent event) {
     sumd[1] = 0x01;
     sumd[2] = 0x02; // 2 channels one for eventChannel, other for eventValue
     // data
-    uint8_t* channelData {splitUint16ToUint8(event.eventChannel())};
-    uint8_t* valueData {splitUint16ToUint8(event.eventValue())};
+    uint8_t* channelData {Util::splitUint16ToUint8(event.eventChannel())};
+    uint8_t* valueData {Util::splitUint16ToUint8(event.eventValue())};
     sumd[3] = *channelData;
     channelData++;
     sumd[4] = *channelData;
@@ -58,15 +58,11 @@ uint8_t* Parser::parseToSumd(QtRoboEvent event) {
     sumd[6] = *valueData;
     // crc - 42 as placeholder
     uint16_t crc {crc16(42, 42)};
-    uint8_t* crcSumd {splitUint16ToUint8(crc)};
+    uint8_t* crcSumd {Util::splitUint16ToUint8(crc)};
     sumd[7] = *crcSumd;
     crcSumd++;
     sumd[8] = *crcSumd;
     return sumd;
-}
-
-int charToInt(char c) {
-    return c - '0';
 }
 
 uint16_t crc16(uint16_t crc, uint8_t value) {
@@ -80,22 +76,4 @@ uint16_t crc16(uint16_t crc, uint8_t value) {
             crc = crc << 1;
     }
     return crc;
-}
-
-uint8_t* splitUint16ToUint8(uint16_t value) {
-    static uint8_t bytes[2];
-    bytes[0] = *((uint8_t*) & (value)+1); // high byte
-    bytes[1] = *((uint8_t*) & (value)+0); // low byte
-    return bytes;
-}
-
-string sumdBytesToString(uint8_t* sumd) {
-    string out {""};
-    uint8_t *b = sumd;
-    for(int i {0}; i < 9; i++) {
-        bitset<8> bits(*b);
-        out += bits.to_string();
-        b++;
-    }
-    return out;
 }
