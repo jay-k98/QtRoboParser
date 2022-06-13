@@ -1,5 +1,4 @@
 #include "Util.h"
-#include <bitset>
 
 using namespace std;
 

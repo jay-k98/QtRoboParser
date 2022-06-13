@@ -68,6 +68,8 @@ int main() {
             exit(1);
         }
 
+        printf("after method");
+
         while ((bytes_rec = read(connect_socket, buf, 256)) > 0) {
             if (write(STDOUT_FILENO, buf, bytes_rec) != bytes_rec) {
             }

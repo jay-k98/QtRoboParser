@@ -1,5 +1,6 @@
 #include "Parser.h"
 #include "QtRoboEvent.h"
+#include "SocketConnection.h"
 
 #define MIN_CHANNEL 0
 #define MAX_CHANNEL 31
@@ -19,14 +20,20 @@ int main(int argc, char const *argv[])
         exit(1);
     }
     string prefix {argv[2]};
-    string path {argv[3]};
 
     cout << "Launched with following arguments:\n"
         << prefix << "\n"
         << channel << "\n"
-        << path << "\n";
+        << argv[3] << "\n";
 
-    // TODO: Create socket and start listening
+    SocketConnection sc = SocketConnection{argv[3]};
+    sc.connect();
+
+    char buffer[256];
+
+    sc.readToBuffer(buffer);
+
+    
     
     return 0;
 }

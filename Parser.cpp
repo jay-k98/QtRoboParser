@@ -1,5 +1,5 @@
  
-#include <Parser.h>
+#include "Parser.h"
 #include "Util.h"
 #include <ctype.h>
 #include <iostream>
@@ -65,7 +65,7 @@ uint8_t* Parser::parseToSumd(QtRoboEvent event) {
     return sumd;
 }
 
-uint16_t crc16(uint16_t crc, uint8_t value) {
+uint16_t Parser::crc16(uint16_t crc, uint8_t value) {
     uint8_t i;
     crc = crc ^ (int16_t)value << 8;
 

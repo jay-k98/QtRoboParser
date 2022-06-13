@@ -1,4 +1,7 @@
 #pragma once
+#include <bitset>
+#include <cstdint>
+#include <string>
 
 using namespace std;
 

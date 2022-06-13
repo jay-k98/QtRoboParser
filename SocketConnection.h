@@ -1,3 +1,5 @@
+#pragma once
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -15,17 +17,18 @@ using namespace std;
 class SocketConnection
 {
 private:
+    bool m_connected = false;
     const char* SOCK_PATH;
-    int m_socket, connect_socket, rc;
+    int m_socket, m_connect_socket, rc;
     socklen_t len;
     int bytes_rec {0};
     int backlog {10};
     struct sockaddr_un sockaddress;
-
-    char buf[256];
 public:
     SocketConnection(const char* socketPath);
     ~SocketConnection() = default;
 
     int connect();
+
+    int readToBuffer(char buffer[]);
 };

@@ -1,4 +1,4 @@
-#include <SocketConnection.h>
+#include "SocketConnection.h"
 
 SocketConnection::SocketConnection(const char* socketPath)
 {
@@ -6,8 +6,6 @@ SocketConnection::SocketConnection(const char* socketPath)
 
     // clear structs and buffer
     memset(&sockaddress, 0, sizeof(struct sockaddr_un));
-    memset(buf, 0, 256);
-
 }
 
 int SocketConnection::connect()
@@ -39,26 +37,32 @@ int SocketConnection::connect()
         exit(1);
     }
 
-    printf("socket listening...\n");
+    printf("socket created...\n");
 
-    for(;;) {
-        connect_socket = accept(m_socket, NULL, NULL);
-        if (connect_socket == -1) {
+    while (false == m_connected) {
+        printf("awaiting connection of client...\n");
+
+        m_connect_socket = accept(m_socket, NULL, NULL);
+        if (m_connect_socket == -1) {
             printf("Error while connecting");
-            close(connect_socket);
+            close(m_connect_socket);
             exit(1);
         }
+        m_connected = true;
+    }
+}
 
-        while ((bytes_rec = read(connect_socket, buf, 256)) > 0) {
+int SocketConnection::readToBuffer(char buf[])
+{
+        while ((bytes_rec = read(m_connect_socket, buf, 256)) > 0) {
             if (write(STDOUT_FILENO, buf, bytes_rec) != bytes_rec) {
             }
         }
 
         if (bytes_rec == -1){
             printf("Read error");
-            close(connect_socket);
+            close(m_connect_socket);
             close(m_socket);
             exit(1);
         }
-    }
 }
