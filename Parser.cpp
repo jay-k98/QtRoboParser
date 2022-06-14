@@ -3,6 +3,7 @@
 #include "Util.h"
 #include <ctype.h>
 #include <iostream>
+#include <array>
 
 using namespace std;
 
@@ -52,8 +53,8 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
 }
 
 
-uint8_t* Parser::parseToSumd(const QtRoboEvent& event) {
-    static uint8_t sumd[9];
+array<uint8_t, 9> Parser::parseToSumd(const QtRoboEvent& event) {
+    array<uint8_t, 9> sumd;
     // header
     sumd[0] = 0xA8;
     sumd[1] = 0x03;
