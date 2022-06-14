@@ -51,7 +51,7 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
 }
 
 
-uint8_t* Parser::parseToSumd(QtRoboEvent event) {
+uint8_t* Parser::parseToSumd(const QtRoboEvent& event) {
     static uint8_t sumd[9];
     // header
     sumd[0] = 0xA8;

@@ -14,7 +14,7 @@ public:
 
     QtRoboEvent parseToQtRoboEvent(char buffer[256]);
 
-    std::uint8_t* parseToSumd(QtRoboEvent event);
+    std::uint8_t* parseToSumd(const QtRoboEvent& event);
 
     uint16_t crc16(uint16_t crc, uint8_t value);
 };
