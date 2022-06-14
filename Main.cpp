@@ -36,14 +36,14 @@ int main(int argc, char const *argv[])
     while (true)
     {
         write(STDOUT_FILENO, buffer, sc.readToBuffer(buffer));
-        Parser p = Parser{argv[2]};
+        Parser p {Parser{argv[2]}};
 
         QtRoboEvent event = p.parseToQtRoboEvent(buffer);
 
         cout << to_string(event.eventChannel()) << endl;
         cout << to_string(event.eventValue()) << endl;
 
-        uint8_t* sumd = p.parseToSumd(event);
+        uint8_t* sumd {p.parseToSumd(event)};
 
         cout << Util::sumdBytesToString(sumd) << endl;
     }

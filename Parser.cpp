@@ -83,9 +83,9 @@ uint16_t Parser::crc16(uint16_t crc, uint8_t value) {
 
     for (i = 0; i < 8; i++) {
         if (crc & 0x8000)
-            crc = crc << 1 ^ 0x1021;
+            crc = (crc << 1) ^ 0x1021;
         else
-            crc = crc << 1;
+            crc = (crc << 1);
     }
     return crc;
 }
