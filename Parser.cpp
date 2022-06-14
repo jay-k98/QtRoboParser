@@ -16,9 +16,11 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
     uint8_t eventChannel {0};
     uint8_t eventValue {0};
     uint8_t base10 {10};
-    ParserState currentState = ParserState::undefined;
+    ParserState currentState {ParserState::undefined};
+    QtRoboEventType eventType {QtRoboEventType::binary};
     cout << buffer << endl;;
     char *c = buffer;
+    bool valueReached {false};
     while (*c != '\0') {
         switch(currentState) {
             case ParserState::undefined:
@@ -31,6 +33,7 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
                 }
                 if (*c == ':')
                     currentState = ParserState::value;
+                    valueReached = true;
                 break;
             case ParserState::value:
                 if (isdigit(*c)) {
@@ -41,7 +44,10 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
         c++;
     }
 
-    return QtRoboEvent{eventChannel, eventValue};
+    if (valueReached)
+        eventType = QtRoboEventType::proportional;
+
+    return QtRoboEvent{eventChannel, eventValue, eventType};
 }
 
 
