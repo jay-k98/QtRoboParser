@@ -6,7 +6,7 @@
 
 using namespace std;
 
-enum ParserState { undefined, channel, value };
+enum class ParserState { undefined, channel, value };
 
 Parser::Parser(const char* prefix) {
     m_Prefix = prefix;
@@ -16,23 +16,23 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
     uint8_t eventChannel {0};
     uint8_t eventValue {0};
     uint8_t base10 {10};
-    ParserState currentState = undefined;
+    ParserState currentState = ParserState::undefined;
     cout << buffer << endl;;
     char *c = buffer;
     while (*c != '\0') {
         switch(currentState) {
-            case undefined:
+            case ParserState::undefined:
                 if (*c == '$')
-                    currentState = channel;
+                    currentState = ParserState::channel;
                 break;
-            case channel:
+            case ParserState::channel:
                 if (isdigit(*c)) {
                     eventChannel = eventChannel * base10 + Util::charToInt(*c);
                 }
                 if (*c == ':')
-                    currentState = value;
+                    currentState = ParserState::value;
                 break;
-            case value:
+            case ParserState::value:
                 if (isdigit(*c)) {
                     eventValue = eventValue * base10 + Util::charToInt(*c);
                 }
