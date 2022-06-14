@@ -6,6 +6,8 @@
 
 using namespace std;
 
+constexpr uint8_t base10 {10};
+
 enum class ParserState { undefined, channel, value };
 
 Parser::Parser(const char* prefix) {
@@ -15,7 +17,6 @@ Parser::Parser(const char* prefix) {
 QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
     uint8_t eventChannel {0};
     uint8_t eventValue {0};
-    uint8_t base10 {10};
     ParserState currentState {ParserState::undefined};
     QtRoboEventType eventType {QtRoboEventType::binary};
     cout << buffer << endl;;
