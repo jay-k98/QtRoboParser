@@ -54,10 +54,10 @@ int SocketConnection::connect()
 
 int SocketConnection::readToBuffer(char buf[])
 {
-        while ((bytes_rec = read(m_connect_socket, buf, 256)) > 0) {
-            if (write(STDOUT_FILENO, buf, bytes_rec) != bytes_rec) {
-            }
-        }
+        bytes_rec = read(m_connect_socket, buf, 256);
+            //if (write(STDOUT_FILENO, buf, bytes_rec) != bytes_rec) {
+            //}
+        //}
 
         if (bytes_rec == -1){
             printf("Read error");
@@ -65,4 +65,6 @@ int SocketConnection::readToBuffer(char buf[])
             close(m_socket);
             exit(1);
         }
+
+        return bytes_rec;
 }

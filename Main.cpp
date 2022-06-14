@@ -1,6 +1,7 @@
 #include "Parser.h"
 #include "QtRoboEvent.h"
 #include "SocketConnection.h"
+#include "Util.h"
 
 #define MIN_CHANNEL 0
 #define MAX_CHANNEL 31
@@ -31,9 +32,21 @@ int main(int argc, char const *argv[])
 
     char buffer[256];
 
-    sc.readToBuffer(buffer);
+    
+    while (1)
+    {
+        write(STDOUT_FILENO, buffer, sc.readToBuffer(buffer));
+        Parser p = Parser{argv[2]};
 
-    
-    
+        QtRoboEvent event = p.parseToQtRoboEvent(buffer);
+
+        cout << to_string(event.eventChannel()) << endl;
+        cout << to_string(event.eventValue()) << endl;
+
+        uint8_t* sumd = p.parseToSumd(event);
+
+        cout << Util::sumdBytesToString(sumd) << endl;
+    }
+
     return 0;
 }

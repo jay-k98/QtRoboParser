@@ -8,12 +8,17 @@ using namespace std;
 
 enum ParserState { undefined, channel, value };
 
-QtRoboEvent Parser::parseToQtRoboEvent() {
+Parser::Parser(const char* prefix) {
+    m_Prefix = prefix;
+}
+
+QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
     uint8_t eventChannel {0};
     uint8_t eventValue {0};
     uint8_t base10 {10};
     ParserState currentState = undefined;
-    char *c = m_buffer;
+    cout << buffer << endl;;
+    char *c = buffer;
     while (*c != '\0') {
         switch(currentState) {
             case undefined:
@@ -35,9 +40,8 @@ QtRoboEvent Parser::parseToQtRoboEvent() {
         }
         c++;
     }
-    cout << eventChannel << endl;
-    cout << eventValue << endl;
-    QtRoboEvent event {eventChannel, eventValue};
+
+    return QtRoboEvent{eventChannel, eventValue};
 }
 
 

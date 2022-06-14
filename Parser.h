@@ -6,14 +6,13 @@
 class Parser
 {
 private:
-    char* m_buffer;
-    char* m_Prefix;
+    const char* m_Prefix;
 
 public:
-    Parser(char* buffer, char* prefix);
+    Parser(const char* prefix);
     ~Parser() = default;
 
-    QtRoboEvent parseToQtRoboEvent();
+    QtRoboEvent parseToQtRoboEvent(char buffer[256]);
 
     std::uint8_t* parseToSumd(QtRoboEvent event);
 
