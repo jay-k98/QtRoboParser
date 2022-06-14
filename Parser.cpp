@@ -55,8 +55,8 @@ uint8_t* Parser::parseToSumd(QtRoboEvent event) {
     static uint8_t sumd[9];
     // header
     sumd[0] = 0xA8;
-    sumd[1] = 0x01;
-    sumd[2] = 0x02; // 2 channels one for eventChannel, other for eventValue
+    sumd[1] = 0x03;
+    sumd[2] = 0x12;
     // data
     uint8_t* channelData {Util::splitUint16ToUint8(event.eventChannel())};
     uint8_t* valueData {Util::splitUint16ToUint8(event.eventValue())};
