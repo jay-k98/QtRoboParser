@@ -33,7 +33,7 @@ int main(int argc, char const *argv[])
     char buffer[256];
 
     
-    while (1)
+    while (true)
     {
         write(STDOUT_FILENO, buffer, sc.readToBuffer(buffer));
         Parser p = Parser{argv[2]};
