@@ -1,0 +1,1 @@
+enum class QtRoboEventType { binary, proportional };
