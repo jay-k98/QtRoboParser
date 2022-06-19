@@ -53,27 +53,21 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
 }
 
 
-array<uint8_t, 9> Parser::parseToSumd(const QtRoboEvent& event) {
-    array<uint8_t, 9> sumd;
+array<uint8_t, 73> Parser::parseToSumd(const QtRoboEvent& event) {
+    // 3 Bytes for Header#
+    // 32 x 2 = 64 Bytes for data
+    // 4 Bytes for Func Code, Last valid packages, MODE CMD, SUB CMD
+    // 2 Bytes for CRC
+    // -> 73 Bytes in total
+    array<uint8_t, 73> sumd;
     // header
     sumd[0] = 0xA8;
     sumd[1] = 0x03;
     sumd[2] = 0x12;
     // data
-    uint8_t* channelData {Util::splitUint16ToUint8(event.eventChannel())};
-    uint8_t* valueData {Util::splitUint16ToUint8(event.eventValue())};
-    sumd[3] = *channelData;
-    channelData++;
-    sumd[4] = *channelData;
-    sumd[5] = *valueData;
-    valueData++;
-    sumd[6] = *valueData;
+    
     // crc - 42 as placeholder
-    uint16_t crc {crc16(42, 42)};
-    uint8_t* crcSumd {Util::splitUint16ToUint8(crc)};
-    sumd[7] = *crcSumd;
-    crcSumd++;
-    sumd[8] = *crcSumd;
+    
     return sumd;
 }
 
