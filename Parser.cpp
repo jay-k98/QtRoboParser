@@ -7,8 +7,6 @@
 
 using namespace std;
 
-constexpr uint8_t base10 {10};
-
 enum class ParserState { undefined, channel, value };
 
 Parser::Parser(const char* prefix) {
@@ -53,13 +51,13 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
 }
 
 
-array<uint8_t, 73> Parser::parseToSumd(const QtRoboEvent& event) {
-    // 3 Bytes for Header#
-    // 32 x 2 = 64 Bytes for data
+array<uint8_t, 41> Parser::parseToSumd(const QtRoboEvent& event) {
+    // 3 Bytes for Header
+    // 16 x 2 = 32 Bytes for data
     // 4 Bytes for Func Code, Last valid packages, MODE CMD, SUB CMD
     // 2 Bytes for CRC
     // -> 73 Bytes in total
-    array<uint8_t, 73> sumd;
+    array<uint8_t, 41> sumd;
     // header
     sumd[0] = 0xA8;
     sumd[1] = 0x03;

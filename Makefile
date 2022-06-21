@@ -2,23 +2,19 @@ CC=g++
 CFLAGS=-Wall -Wextra
 LDFLAGS=-lm
 
-qtroboparser : main.o qtroboevent.o parser.o socketconnection.o util.o
-				cc -o qtroboparser Main.o QtRoboEvent.o Parser.o SocketConnection.o Util.o -lstdc++
+Main : Main.o QtRoboEvent.o Parser.o SocketConnection.o Util.o Buffer.o
 
-main.o : Main.cpp Parser.h QtRoboEvent.h SocketConnection.h
-		cc -c Main.cpp -lstdc++
+Main.o : Main.cpp Parser.h QtRoboEvent.h SocketConnection.h
 
-qtroboevent.o : QtRoboEvent.cpp QtRoboEvent.h
-				cc -c QtRoboEvent.cpp -lstdc++
+QtRoboEvent.o : QtRoboEvent.cpp QtRoboEvent.h
 
-parser.o : Parser.cpp Parser.h QtRoboEvent.h Util.h
-				cc -c Parser.cpp -lstdc++
+Parser.o : Parser.cpp Parser.h QtRoboEvent.h Util.h
 
-socketconnection.o : SocketConnection.cpp SocketConnection.h
-				cc -c SocketConnection.cpp -lstdc++
+SocketConnection.o : SocketConnection.cpp SocketConnection.h
 
-util.o : Util.cpp Util.h
-		cc -c Util.cpp -lstdc++
+Util.o : Util.cpp Util.h
+
+Buffer.o : Buffer.cpp Buffer.h QtRoboEvent.h
 
 clean :
-		rm main.o qtroboevent.o parser.o socketconnection.o
+		rm Main.o QtRoboEvent.o Parser.o SocketConnection.o Util.o Buffer.o qtroboparser

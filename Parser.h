@@ -1,7 +1,9 @@
 #pragma once
 #include <iostream>
+#include <array>
 #include "QtRoboEvent.h"
 
+constexpr uint8_t base10 {10};
 
 class Parser
 {
@@ -14,7 +16,7 @@ public:
 
     QtRoboEvent parseToQtRoboEvent(char buffer[256]);
 
-    array<uint8_t, 73> parseToSumd(const QtRoboEvent& event);
+    std::array<uint8_t, 41> parseToSumd(const QtRoboEvent& event);
 
     uint16_t crc16(uint16_t crc, uint8_t value);
 };

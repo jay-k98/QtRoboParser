@@ -2,6 +2,7 @@
 #include "QtRoboEvent.h"
 #include "SocketConnection.h"
 #include "Util.h"
+#include "Buffer.h"
 
 #define MIN_CHANNEL 0
 #define MAX_CHANNEL 31
@@ -43,9 +44,11 @@ int main(int argc, char const *argv[])
         cout << to_string(event.eventChannel()) << endl;
         cout << to_string(event.eventValue()) << endl;
 
-        uint8_t* sumd {p.parseToSumd(event)};
+        auto sumd {p.parseToSumd(event)};
 
-        cout << Util::sumdBytesToString(sumd) << endl;
+        Buffer buff{};
+
+        //cout << Util::sumdBytesToString(sumd) << endl;
     }
 
     return 0;

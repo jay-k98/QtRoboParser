@@ -66,5 +66,7 @@ int SocketConnection::readToBuffer(char buf[])
             exit(1);
         }
 
+        // Wenn Größe 0 ist wurde connection geschlossen
+
         return bytes_rec;
 }
