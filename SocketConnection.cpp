@@ -1,8 +1,8 @@
 #include "SocketConnection.h"
 
-SocketConnection::SocketConnection(const char* socketPath)
+SocketConnection::SocketConnection(const std::string& socketPath)
 {
-    SOCK_PATH = socketPath;
+    SOCK_PATH = socketPath.c_str();
 
     // clear structs and buffer
     memset(&sockaddress, 0, sizeof(struct sockaddr_un));
@@ -54,19 +54,22 @@ int SocketConnection::connect()
 
 int SocketConnection::readToBuffer(char buf[])
 {
-        bytes_rec = read(m_connect_socket, buf, 256);
-            //if (write(STDOUT_FILENO, buf, bytes_rec) != bytes_rec) {
-            //}
-        //}
+    constexpr size_t buffSize = 256;
+    bytes_rec = read(m_connect_socket, buf, buffSize);
 
-        if (bytes_rec == -1){
-            printf("Read error");
-            close(m_connect_socket);
-            close(m_socket);
-            exit(1);
-        }
+    if (bytes_rec == -1){
+        printf("Read error");
+        close(m_connect_socket);
+        close(m_socket);
+        exit(1);
+    }
 
-        // Wenn Größe 0 ist wurde connection geschlossen
+    if (bytes_rec == 0){
+        printf("Connection closed by client");
+        close(m_connect_socket);
+        close(m_socket);
+        m_connected = false;
+    }
 
-        return bytes_rec;
+    return bytes_rec;
 }

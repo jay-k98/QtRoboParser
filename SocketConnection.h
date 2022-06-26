@@ -25,7 +25,7 @@ private:
     int backlog {10};
     struct sockaddr_un sockaddress;
 public:
-    SocketConnection(const char* socketPath);
+    SocketConnection(const std::string& socketPath);
     ~SocketConnection() = default;
 
     int connect();
