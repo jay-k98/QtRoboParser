@@ -6,8 +6,8 @@ enum class QtRoboEventType { binary, proportional };
 class QtRoboEvent
 {
 private:
-    u_int8_t mEventChannel;
-    u_int8_t mEventValue;
+    uint8_t mEventChannel;
+    uint8_t mEventValue;
     QtRoboEventType mEventType;
 
 public:
