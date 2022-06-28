@@ -28,6 +28,8 @@ public:
     SocketConnection(const std::string& socketPath);
     ~SocketConnection() = default;
 
+    bool isConnected() const;
+
     int connect();
 
     int readToBuffer(char buffer[]);

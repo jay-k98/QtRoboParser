@@ -2,10 +2,10 @@
 
 using namespace std;
 
-uint8_t* Util::splitUint16ToUint8(uint16_t value) {
-    static uint8_t bytes[2];
-    bytes[0] = *((uint8_t*) & (value)+1); // high byte
-    bytes[1] = *((uint8_t*) & (value)+0); // low byte
+array<uint8_t, 2> Util::splitUint16ToUint8(uint16_t value) {
+    array<uint8_t, 2> bytes;
+    bytes.at(0) = value & 0xff; // high byte
+    bytes.at(1) = (value >> 8); // low byte
     return bytes;
 }
 

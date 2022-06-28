@@ -3,6 +3,9 @@
 #include "SocketConnection.h"
 #include "Util.h"
 #include "Buffer.h"
+#include <thread>
+#include "ReceiverThread.h"
+#include "SenderThread.h"
 
 #define MIN_CHANNEL 0
 #define MAX_CHANNEL 95
@@ -15,7 +18,7 @@ int main(int argc, char const *argv[])
         cerr << "Please enter in the following order: [Prefix] [Name of the Unix Domain Socket]!" << endl;
         exit(1);
     }
-
+    // $ABC12:48
     // argv[0] contains the directory the application was started from
     // -> That is why we start from index 1
     string prefix {argv[1]};
@@ -25,27 +28,19 @@ int main(int argc, char const *argv[])
         << prefix << "\n"
         << argv[2] << "\n";
 
-    SocketConnection sc = SocketConnection{udsname};
-    sc.connect();
-
-    char buffer[256];
-
-    
     while (true)
     {
-        write(STDOUT_FILENO, buffer, sc.readToBuffer(buffer));
-        Parser p {Parser{argv[2]}};
+        SocketConnection socket {udsname};
+        socket.connect();
 
-        QtRoboEvent event = p.parseToQtRoboEvent(buffer);
+        Buffer buffer{};
 
-        cout << to_string(event.eventChannel()) << endl;
-        cout << to_string(event.eventValue()) << endl;
+        std::thread receiverThread {ReceiverThread::threadLoop, std::ref(socket), prefix, std::ref(buffer)};
 
-        auto sumd {p.parseToSumd(event)};
+        std::thread senderThread {SenderThread::threadLoop, std::ref(socket), std::ref(buffer)};
 
-        Buffer buff{};
-
-        //cout << Util::sumdBytesToString(sumd) << endl;
+        receiverThread.join();
+        senderThread.join();
     }
 
     return 0;

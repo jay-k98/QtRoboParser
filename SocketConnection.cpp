@@ -8,6 +8,11 @@ SocketConnection::SocketConnection(const std::string& socketPath)
     memset(&sockaddress, 0, sizeof(struct sockaddr_un));
 }
 
+bool SocketConnection::isConnected() const
+{
+    return m_connected;
+}
+
 int SocketConnection::connect()
 {
     // create unix domain stream socket
@@ -52,7 +57,7 @@ int SocketConnection::connect()
     }
 }
 
-int SocketConnection::readToBuffer(char buf[])
+int SocketConnection::readToBuffer(char buf[256])
 {
     constexpr size_t buffSize = 256;
     bytes_rec = read(m_connect_socket, buf, buffSize);

@@ -1,4 +1,3 @@
- 
 #include "Parser.h"
 #include "Util.h"
 #include <ctype.h>
@@ -9,7 +8,7 @@ using namespace std;
 
 enum class ParserState { undefined, channel, value };
 
-Parser::Parser(const char* prefix) {
+Parser::Parser(const string prefix) {
     m_Prefix = prefix;
 }
 
@@ -18,7 +17,7 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
     uint8_t eventValue {0};
     ParserState currentState {ParserState::undefined};
     QtRoboEventType eventType {QtRoboEventType::binary};
-    cout << buffer << endl;;
+    cout << buffer << endl;
     char *c = buffer;
     bool valueReached {false};
     while (*c != '\0') {
@@ -48,36 +47,4 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
         eventType = QtRoboEventType::proportional;
 
     return QtRoboEvent{eventChannel, eventValue, eventType};
-}
-
-
-array<uint8_t, 41> Parser::parseToSumd(const QtRoboEvent& event) {
-    // 3 Bytes for Header
-    // 16 x 2 = 32 Bytes for data
-    // 4 Bytes for Func Code, Last valid packages, MODE CMD, SUB CMD
-    // 2 Bytes for CRC
-    // -> 73 Bytes in total
-    array<uint8_t, 41> sumd;
-    // header
-    sumd[0] = 0xA8;
-    sumd[1] = 0x03;
-    sumd[2] = 0x12;
-    // data
-    
-    // crc - 42 as placeholder
-    
-    return sumd;
-}
-
-uint16_t Parser::crc16(uint16_t crc, uint8_t value) {
-    uint8_t i;
-    crc = crc ^ (int16_t)value << 8;
-
-    for (i = 0; i < 8; i++) {
-        if (crc & 0x8000)
-            crc = (crc << 1) ^ 0x1021;
-        else
-            crc = (crc << 1);
-    }
-    return crc;
 }
