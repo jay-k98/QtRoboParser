@@ -5,10 +5,13 @@
 class ReceiverThread
 {
 private:
+    SocketConnection& m_SocketConnection;
+    Parser& m_Parser;
+    Buffer& m_Buffer;
     
 public:
-    ReceiverThread();
+    ReceiverThread(SocketConnection& socketConnection, Parser& parser, Buffer& buffer);
     ~ReceiverThread() = default;
 
-    void threadLoop(SocketConnection& socketConnection, const std::string prefix, Buffer& buffer);
+    void threadLoop();
 };

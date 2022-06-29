@@ -8,8 +8,9 @@ using namespace std;
 
 enum class ParserState { undefined, channel, value };
 
-Parser::Parser(const string prefix) {
-    m_Prefix = prefix;
+Parser::Parser(const ParserConfig& config)
+: m_Config{config} 
+{
 }
 
 QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {

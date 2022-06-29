@@ -4,21 +4,20 @@
 #include "SocketConnection.h"
 #include "Buffer.h"
 
-ReceiverThread::ReceiverThread()
+ReceiverThread::ReceiverThread(SocketConnection& socketConnection, Parser& parser, Buffer& buffer)
+: m_SocketConnection{socketConnection}, m_Parser{parser}, m_Buffer{buffer}
 {
-
 }
 
-void ReceiverThread::threadLoop(SocketConnection& socketConnection, const std::string prefix, Buffer& buffer)
+void ReceiverThread::threadLoop()
 {
-    Parser p {prefix};
-    while (socketConnection.isConnected())
+    while (m_SocketConnection.isConnected())
     {
         char line[256];
-        write(STDOUT_FILENO, line, socketConnection.readToBuffer(line));
+        write(STDOUT_FILENO, line, m_SocketConnection.readToBuffer(line));
 
-        QtRoboEvent event = p.parseToQtRoboEvent(line);
+        QtRoboEvent event = m_Parser.parseToQtRoboEvent(line);
 
-        buffer.reactToQtRoboEvent(event);
+        m_Buffer.reactToQtRoboEvent(event);
     }
 }
