@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 
-enum class QtRoboEventType { binary, proportional };
+enum class QtRoboEventType { binary, proportional, mode, sub };
 
 class QtRoboEvent
 {

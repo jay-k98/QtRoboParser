@@ -4,10 +4,12 @@
 class SenderThread
 {
 private:
+    SocketConnection mSocketConnection;
+    Buffer mBuffer;
 
 public:
-    SenderThread();
+    SenderThread(SocketConnection& socketConnection, Buffer& buffer);
     ~SenderThread();
 
-    void threadLoop(SocketConnection& socketConnection, Buffer& buffer);
+    void threadLoop();
 };

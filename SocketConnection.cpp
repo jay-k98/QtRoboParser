@@ -1,11 +1,17 @@
 #include "SocketConnection.h"
 
-SocketConnection::SocketConnection(const std::string& socketPath)
+SocketConnection::SocketConnection(const std::string& socketPath, bool& isTerminated)
 {
     SOCK_PATH = socketPath.c_str();
 
     // clear structs and buffer
     memset(&sockaddress, 0, sizeof(struct sockaddr_un));
+}
+
+SocketConnection::~SocketConnection()
+{
+    unlink(SOCK_PATH);
+    remove(SOCK_PATH);
 }
 
 bool SocketConnection::isConnected() const
@@ -73,6 +79,8 @@ int SocketConnection::readToBuffer(char buf[256])
         printf("Connection closed by client");
         close(m_connect_socket);
         close(m_socket);
+        unlink(SOCK_PATH);
+        remove(SOCK_PATH);
         m_connected = false;
     }
 

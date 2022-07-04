@@ -1,14 +1,19 @@
 #include <string>
 #include <array>
 #include "QtRoboEvent.h"
+#include "Buffer.h"
 
 using namespace std;
 
 class Sender
 {
     public:
-        const string readBufferAsBytes(const uint8_t funcCode);
-        void send(const array<uint8_t, 41> buffer);
-        array<uint8_t, 41> parseToSumd(const std::array<uint8_t, 32>& data, uint8_t functionCode);
-        uint16_t crc16(uint16_t crc, uint8_t value);
+        Sender() = delete;
+        ~Sender() = default;
+        Sender(Sender& orig) = delete;
+        Sender& operator=(Sender& orig) = delete;
+
+        static const string readBufferAsBytes(const uint8_t funcCode);
+        static void send(const array<uint8_t, 41> buffer);
+        static array<uint8_t, 41> parseToSumd(const std::array<uint8_t, 32>& data, const Modes& modes, uint8_t functionCode);
 };

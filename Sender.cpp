@@ -1,5 +1,6 @@
 #include "Sender.h"
 #include "Util.h"
+#include "Crc.h"
 #include <iostream>
 
 using namespace std;
@@ -13,8 +14,7 @@ void send(const array<uint8_t, 41> eventFrame) {
     cout << eventFrame.at(0) << endl;
 }
 
-
-array<uint8_t, 41> Sender::parseToSumd(const std::array<uint8_t, 32>& data, uint8_t functionCode) {
+array<uint8_t, 41> Sender::parseToSumd(const std::array<uint8_t, 32>& data, const Modes& modes, uint8_t functionCode) {
     // 3 Bytes for Header
     // 16 x 2 = 32 Bytes for data
     // 4 Bytes for Func Code, Last valid packages, MODE CMD, SUB CMD
@@ -37,32 +37,17 @@ array<uint8_t, 41> Sender::parseToSumd(const std::array<uint8_t, 32>& data, uint
 
     sumd.at(35) = functionCode;
     sumd.at(36) = 0x00; // last valid package
-    sumd.at(37) = 0x00; // MODE CMD
-    sumd.at(38) = 0x00; // SUB CMD
+    sumd.at(37) = modes.MODE_CMD; // MODE CMD
+    sumd.at(38) = modes.SUB_CMD; // SUB CMD
 
-    uint16_t crc = 0x00;
-
+    Crc crc16{};
     for (size_t i = 0; i < 35; i++)
     {
-        crc = crc16(crc, sumd.at(i));
+        crc16 += sumd.at(i);
     }
 
-    array<uint8_t, 2> crcValues = Util::splitUint16ToUint8(crc);
-    sumd.at(39) = crcValues.at(0); // high byte crs
-    sumd.at(40) = crcValues.at(1); // low byte crc
+    sumd.at(39) = crc16.highByte(); // high byte crs
+    sumd.at(40) = crc16.lowByte(); // low byte crc
 
     return sumd;
-}
-
-uint16_t Sender::crc16(uint16_t crc, uint8_t value) {
-    uint8_t i;
-    crc = crc ^ (int16_t)value << 8;
-
-    for (i = 0; i < 8; i++) {
-        if (crc & 0x8000)
-            crc = (crc << 1) ^ 0x1021;
-        else
-            crc = (crc << 1);
-    }
-    return crc;
 }

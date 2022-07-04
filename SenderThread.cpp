@@ -3,27 +3,25 @@
 #include <chrono>
 #include <thread>
 
-SenderThread::SenderThread()
+SenderThread::SenderThread(SocketConnection& socketConnection, Buffer& buffer)
+: mSocketConnection{socketConnection}, mBuffer{buffer}
 {
-
 }
 
-void SenderThread::threadLoop(SocketConnection& socketConnection, Buffer& buffer)
+void SenderThread::threadLoop()
 {
-    Sender sender{};
-    while (socketConnection.isConnected())
+    while (mSocketConnection.isConnected())
     {
-        sender.send(sender.parseToSumd(buffer.getFunctionCode02(), 0x02));
+        Sender::send(Sender::parseToSumd(mBuffer.functionCode02(), mBuffer.modes(), 0x02));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-        sender.send(sender.parseToSumd(buffer.getFunctionCode03(), 0x03));
+        Sender::send(Sender::parseToSumd(mBuffer.functionCode03(), mBuffer.modes(), 0x03));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-        sender.send(sender.parseToSumd(buffer.getFunctionCode04(), 0x04));
+        Sender::send(Sender::parseToSumd(mBuffer.functionCode04(), mBuffer.modes(), 0x04));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-        sender.send(sender.parseToSumd(buffer.getFunctionCode05(), 0x05));
+        Sender::send(Sender::parseToSumd(mBuffer.functionCode05(), mBuffer.modes(), 0x05));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-
 }

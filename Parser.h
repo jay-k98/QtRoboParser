@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <array>
+#include <regex>
 #include "QtRoboEvent.h"
 
 struct ParserConfig
@@ -12,6 +13,7 @@ struct ParserConfig
 };
 
 constexpr uint8_t base10 {10};
+const regex numberRegex {"\\d+", regex_constants::ECMAScript};
 
 class Parser
 {

@@ -4,6 +4,7 @@
 #include "Util.h"
 #include "Buffer.h"
 #include <thread>
+#include <csignal>
 #include "ReceiverThread.h"
 #include "SenderThread.h"
 
@@ -12,8 +13,17 @@
 
 using namespace std;
 
+bool isTerminated = true;
+
+void signalHandler(int signum)
+{
+    cout << "Signal: " << signum << endl;
+    isTerminated = false;
+}
+
 int main(int argc, char const *argv[])
 {
+    signal(SIGINT, signalHandler);
     if (argc != 6) {
         cerr << "Please enter in the following order: [Prefix Prop] [Prefix Bin] [Prefix MODE] [Prefix SUB] [Name of the Unix Domain Socket]!" << endl;
         exit(1);
@@ -31,9 +41,9 @@ int main(int argc, char const *argv[])
         << parserConfig.sub_prefix << "\n"
         << argv[2] << "\n";
 
-    while (true)
+    while (isTerminated)
     {
-        SocketConnection socket {udsname};
+        SocketConnection socket {udsname, isTerminated};
         socket.connect();
 
         Buffer buffer{};
@@ -41,7 +51,7 @@ int main(int argc, char const *argv[])
         Parser parser{parserConfig};
 
         ReceiverThread* receiver = new ReceiverThread{socket, parser, buffer};
-        SenderThread* sender = new SenderThread{};
+        SenderThread* sender = new SenderThread{socket, buffer};
 
         std::thread receiverThread {&ReceiverThread::threadLoop, receiver};
         std::thread senderThread {&SenderThread::threadLoop, sender};
