@@ -11,7 +11,6 @@ SocketConnection::SocketConnection(const std::string& socketPath, bool& isTermin
 SocketConnection::~SocketConnection()
 {
     unlink(SOCK_PATH);
-    remove(SOCK_PATH);
 }
 
 bool SocketConnection::isConnected() const
@@ -19,7 +18,7 @@ bool SocketConnection::isConnected() const
     return m_connected;
 }
 
-int SocketConnection::connect()
+std::error_code SocketConnection::connect()
 {
     // create unix domain stream socket
     m_socket = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -61,28 +60,4 @@ int SocketConnection::connect()
         }
         m_connected = true;
     }
-}
-
-int SocketConnection::readToBuffer(char buf[256])
-{
-    constexpr size_t buffSize = 256;
-    bytes_rec = read(m_connect_socket, buf, buffSize);
-
-    if (bytes_rec == -1){
-        printf("Read error");
-        close(m_connect_socket);
-        close(m_socket);
-        exit(1);
-    }
-
-    if (bytes_rec == 0){
-        printf("Connection closed by client");
-        close(m_connect_socket);
-        close(m_socket);
-        unlink(SOCK_PATH);
-        remove(SOCK_PATH);
-        m_connected = false;
-    }
-
-    return bytes_rec;
 }

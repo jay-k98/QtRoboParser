@@ -30,35 +30,35 @@ void Buffer::reactToQtRoboEvent(QtRoboEvent event) {
     constexpr int propEnd {32};
     constexpr int binBreak {64};
     constexpr int binEnd {96};
-
+    
     if (QtRoboEventType::proportional == event.eventType()) {
-        size_t index{event.eventChannel() * 2};
+        size_t index{event.eventChannel() * 2U};
         if (event.eventChannel() < propBreak) {
             std::lock_guard<std::mutex> guard(mutex_func02);
             funcCode02.at(index) = 0x00;
             funcCode02.at(index + 1) = event.eventValue();
         }
-        if (event.eventChannel() > propBreak && event.eventChannel() < propEnd) {
+        else if (event.eventChannel() > propBreak && event.eventChannel() < propEnd) {
             std::lock_guard<std::mutex> guard(mutex_func03);
             funcCode03.at(index) = 0x00;
             funcCode03.at(index + 1) = event.eventValue();
         }
     }
-    if (QtRoboEventType::binary == event.eventType()) {
+    else if (QtRoboEventType::binary == event.eventType()) {
         if (event.eventChannel() > propEnd && event.eventChannel() < binBreak) {
             std::lock_guard<std::mutex> guard(mutex_func04);
             funcCode04.at(event.eventChannel()) ^= 1UL << 0;
         }
-        if (event.eventChannel() > binBreak && event.eventChannel() < binEnd) {
+        else if (event.eventChannel() > binBreak && event.eventChannel() < binEnd) {
             std::lock_guard<std::mutex> guard(mutex_func05);
             funcCode05.at(event.eventChannel()) ^= 1UL << 0;
         }
     }
-    if (QtRoboEventType::mode == event.eventType()) {
+    else if (QtRoboEventType::mode == event.eventType()) {
         std::lock_guard<std::mutex> guard(mutex_modes);
         m_modes.MODE_CMD ^= 1UL << 0;
     }
-    if (QtRoboEventType::sub == event.eventType()) {
+    else if (QtRoboEventType::sub == event.eventType()) {
         std::lock_guard<std::mutex> guard(mutex_modes);
         m_modes.SUB_CMD ^= 1UL << 0;
     }

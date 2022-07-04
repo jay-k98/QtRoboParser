@@ -1,57 +1,49 @@
 #include "Parser.h"
-#include "Util.h"
 #include <ctype.h>
 #include <iostream>
 #include <array>
 #include <regex>
-
-using namespace std;
-
-enum class ParserState { undefined, prefix, channel, value };
 
 Parser::Parser(const ParserConfig& config)
 : m_Config{config}
 {
 }
 
-    // $Prefix15:56
-
-    // $Prop15:56
-    // $MODE
-    // $Bin48
-    // $SUB
-
-    // Prefix{Prop, Bin, MODE, SUB}
-QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
-    string line {buffer};
-    uint8_t eventChannel {0};
-    uint8_t eventValue {0};
-    ParserState currentState {ParserState::undefined};
-    QtRoboEventType eventType {QtRoboEventType::binary};
-    cout << buffer << endl;
+// $Prefix15:56
+// $Prop15:56
+// $MODE
+// $Bin48
+// $SUB
+QtRoboEvent Parser::parseToQtRoboEvent(std::array<char, 256> buffer) {
+    std::string line {std::begin(buffer), std::end(buffer)};
+    
+    std::cout << line << std::endl;
 
     if (line.at(0) == '$')
     {
-        if (line.find(m_Config.bin_prefix) != string::npos)
+        uint8_t eventChannel {0};
+        uint8_t eventValue {0};
+        QtRoboEventType eventType {QtRoboEventType::binary};
+        if (line.find(m_Config.bin_prefix) != std::string::npos)
         {
             eventType = QtRoboEventType::binary;
-            sregex_iterator iterator{line.begin(), line.end(), numberRegex};
+            std::sregex_iterator iterator{line.begin(), line.end(), numberRegex};
 
-            for (sregex_iterator i {iterator}; i != sregex_iterator{}; ++i)
+            for (std::sregex_iterator i {iterator}; i != std::sregex_iterator{}; ++i)
             {
-                smatch match{*i};
+                std::smatch match{*i};
                 eventChannel = stoi(match.str());
             }
         }
-        if (line.find(m_Config.prop_prefix) != string::npos)
+        else if (line.find(m_Config.prop_prefix) != std::string::npos)
         {
             eventType = QtRoboEventType::proportional;
-            sregex_iterator iterator{line.begin(), line.end(), numberRegex};
+            std::sregex_iterator iterator{line.begin(), line.end(), numberRegex};
 
-            size_t idx{0};
-            for (sregex_iterator i {iterator}; i != sregex_iterator{}; ++i)
+            std::size_t idx{0};
+            for (std::sregex_iterator i {iterator}; i != std::sregex_iterator{}; ++i)
             {
-                smatch match{*i};
+                std::smatch match{*i};
                 if (0 == idx)
                 {
                     eventChannel = stoi(match.str());
@@ -63,47 +55,17 @@ QtRoboEvent Parser::parseToQtRoboEvent(char buffer[256]) {
                 idx++;
             }
         }
-        if (line.find(m_Config.mode_prefix) != string::npos)
+        else if (line.find(m_Config.mode_prefix) != std::string::npos)
         {
             eventType = QtRoboEventType::mode;
         }
-        if (line.find(m_Config.sub_prefix) != string::npos)
+        else if (line.find(m_Config.sub_prefix) != std::string::npos)
         {
             eventType = QtRoboEventType::sub;
         }
+        return QtRoboEvent{eventChannel, eventValue, eventType};
     }
 
-    return QtRoboEvent{eventChannel, eventValue, eventType};
-
-    /**
-    while (*c != '\0') {
-        switch(currentState) {
-            case ParserState::undefined:
-                if (line.at(0) == '$')
-                    currentState = ParserState::channel;
-                break;
-            case ParserState::prefix:
-
-                break;
-            case ParserState::channel:
-                if (isdigit(*c)) {
-                    eventChannel = eventChannel * base10 + Util::charToInt(*c);
-                }
-                if (*c == ':')
-                    currentState = ParserState::value;
-                    valueReached = true;
-                break;
-            case ParserState::value:
-                if (isdigit(*c)) {
-                    eventValue = eventValue * base10 + Util::charToInt(*c);
-                }
-                break;
-        }
-        c++;
-        
-    }
-
-    if (valueReached)
-        eventType = QtRoboEventType::proportional;
-    */
+    std::cerr << "Message from Socket is not a QtRoboEvent (Does not start with $)" << std::endl;
+    return QtRoboEvent{0, 0, QtRoboEventType::error};
 }

@@ -1,23 +1,20 @@
 #include "ReceiverThread.h"
-#include "Parser.h"
-#include "QtRoboEvent.h"
-#include "SocketConnection.h"
-#include "Buffer.h"
 
-ReceiverThread::ReceiverThread(SocketConnection& socketConnection, Parser& parser, Buffer& buffer)
-: m_SocketConnection{socketConnection}, m_Parser{parser}, m_Buffer{buffer}
+ReceiverThread::ReceiverThread(SocketConnection &socketConnection, Parser &parser, Buffer &buffer, bool& isTerminated)
+: m_SocketConnection{socketConnection}, m_Parser{parser}, m_Buffer{buffer}, m_isTerminated{isTerminated}
 {
 }
 
-void ReceiverThread::threadLoop()
+ReceiverThread ReceiverThread::operator()()
 {
-    while (m_SocketConnection.isConnected())
+    while (m_SocketConnection.isConnected() && !m_isTerminated)
     {
-        char line[256];
-        write(STDOUT_FILENO, line, m_SocketConnection.readToBuffer(line));
+        std::array<char, 256> line{};
+        write(STDOUT_FILENO, &line[0], m_SocketConnection.readToBuffer(line));
 
         QtRoboEvent event = m_Parser.parseToQtRoboEvent(line);
 
         m_Buffer.reactToQtRoboEvent(event);
     }
+    return *this;
 }

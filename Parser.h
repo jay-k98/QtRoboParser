@@ -1,4 +1,5 @@
 #pragma once
+
 #include <iostream>
 #include <array>
 #include <regex>
@@ -10,10 +11,20 @@ struct ParserConfig
     std::string bin_prefix;
     std::string mode_prefix;
     std::string sub_prefix;
+
+    friend std::ostream& operator<<(std::ostream& out, const ParserConfig& cfg)
+    {
+        out << "Launched with the following arguments:\n"
+         << cfg.prop_prefix << "\n"
+         << cfg.bin_prefix << "\n"
+         << cfg.mode_prefix << "\n"
+         << cfg.sub_prefix << "\n";
+        return out;
+    }
 };
 
 constexpr uint8_t base10 {10};
-const regex numberRegex {"\\d+", regex_constants::ECMAScript};
+const std::regex numberRegex {"\\d+", std::regex_constants::ECMAScript};
 
 class Parser
 {
@@ -24,7 +35,7 @@ public:
     Parser(const ParserConfig& config);
     ~Parser() = default;
 
-    QtRoboEvent parseToQtRoboEvent(char buffer[256]);
+    QtRoboEvent parseToQtRoboEvent(std::array<char, 256> buffer);
 
     uint16_t crc16(uint16_t crc, uint8_t value);
 };

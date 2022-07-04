@@ -9,10 +9,10 @@
 #include <errno.h>
 #include <string.h>
 #include <iostream>
+#include <array>
+#include <system_error>
 
 #define BACKLOG 5
-
-using namespace std;
 
 class SocketConnection
 {
@@ -24,13 +24,35 @@ private:
     int bytes_rec {0};
     int backlog {10};
     struct sockaddr_un sockaddress;
+
 public:
     SocketConnection(const std::string& socketPath, bool& isTerminated);
     ~SocketConnection();
 
     bool isConnected() const;
 
-    int connect();
+    std::error_code connect();
 
-    int readToBuffer(char buffer[]);
+    template<std::size_t SIZE>
+    int readToBuffer(std::array<char, SIZE> buff)
+    {
+        bytes_rec = read(m_connect_socket, &buff[0], SIZE);
+
+        if (bytes_rec == -1){
+            printf("Read error");
+            close(m_connect_socket);
+            close(m_socket);
+            return -1;
+        }
+
+        if (bytes_rec == 0){
+            printf("Connection closed by client");
+            close(m_connect_socket);
+            close(m_socket);
+            unlink(SOCK_PATH);
+            m_connected = false;
+        }
+
+        return bytes_rec;
+    }
 };

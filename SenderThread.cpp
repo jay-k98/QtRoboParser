@@ -1,16 +1,15 @@
 #include "SenderThread.h"
-#include "Sender.h"
 #include <chrono>
 #include <thread>
 
-SenderThread::SenderThread(SocketConnection& socketConnection, Buffer& buffer)
-: mSocketConnection{socketConnection}, mBuffer{buffer}
+SenderThread::SenderThread(SocketConnection& socketConnection, Buffer& buffer, bool& isTerminated)
+: mSocketConnection{socketConnection}, mBuffer{buffer}, m_isTerminated{isTerminated}
 {
 }
 
-void SenderThread::threadLoop()
+SenderThread SenderThread::operator()()
 {
-    while (mSocketConnection.isConnected())
+    while (mSocketConnection.isConnected() && !m_isTerminated)
     {
         Sender::send(Sender::parseToSumd(mBuffer.functionCode02(), mBuffer.modes(), 0x02));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -24,4 +23,5 @@ void SenderThread::threadLoop()
         Sender::send(Sender::parseToSumd(mBuffer.functionCode05(), mBuffer.modes(), 0x05));
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+    return *this;
 }

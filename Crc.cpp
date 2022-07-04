@@ -5,17 +5,24 @@ Crc::Crc(uint16_t& start)
 {
 }
 
-uint16_t Crc::calculateCrc16(uint16_t& start, uint8_t& value)
+uint8_t Crc::highByte() const {
+    return crc16 & 0xff;;
+}
+
+uint8_t Crc::lowByte() const {
+    return (crc16 >> 8);;
+}
+
+Crc& Crc::operator+=(const uint8_t& rhs)
 {
-    uint16_t crc = start;
     uint8_t i;
-    crc = crc ^ (int16_t)value << 8;
+    crc16 = crc16 ^ (int16_t)rhs << 8;
 
     for (i = 0; i < 8; i++) {
-        if (crc & 0x8000)
-            crc = (crc << 1) ^ 0x1021;
+        if (crc16 & 0x8000)
+            crc16 = (crc16 << 1) ^ 0x1021;
         else
-            crc = (crc << 1);
+            crc16 = (crc16 << 1);
     }
-    return crc;
+    return *this;
 }

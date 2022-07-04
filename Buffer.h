@@ -21,14 +21,14 @@ private:
     std::array<uint8_t, 32> funcCode05{};
     Modes m_modes{};
 
-    std::mutex mutex_func02;
-    std::mutex mutex_func03;
-    std::mutex mutex_func04;
-    std::mutex mutex_func05;
-    std::mutex mutex_modes;
+    std::mutex mutex_func02{};
+    std::mutex mutex_func03{};
+    std::mutex mutex_func04{};
+    std::mutex mutex_func05{};
+    std::mutex mutex_modes{};
 
 public:
-    Buffer();
+    Buffer() = default;
     ~Buffer() = default;
 
     const std::array<uint8_t, 32> functionCode02();
