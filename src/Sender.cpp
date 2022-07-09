@@ -1,14 +1,16 @@
 #include "Sender.h"
 #include <iostream>
 
-void Sender::send(const std::array<uint8_t, 41> eventFrame) {
+void Sender::send(const std::array<uint8_t, 41> eventFrame)
+{
     for (size_t i = 0; i < eventFrame.size(); i++)
     {
         std::cout << "Byte " << i << ": " << unsigned(eventFrame.at(i)) << std::endl;
     }
 }
 
-std::array<uint8_t, 41> Sender::parseToSumd(const std::array<uint8_t, 32>& data, const Modes& modes, uint8_t functionCode) {
+std::array<uint8_t, 41> Sender::parseToSumd(const std::array<uint8_t, 32>& data, const Modes& modes, uint8_t functionCode)
+{
     // 3 Bytes for Header
     // 16 x 2 = 32 Bytes for data
     // 4 Bytes for Func Code, Last valid packages, MODE CMD, SUB CMD

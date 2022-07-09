@@ -41,7 +41,8 @@ std::error_code SocketConnection::connect()
         exit(1);
     }
 
-    if (listen(m_socket, BACKLOG) == -1) {
+    if (listen(m_socket, BACKLOG) == -1)
+    {
         printf("Error while listening");
         close(m_socket);
         exit(1);
@@ -49,11 +50,13 @@ std::error_code SocketConnection::connect()
 
     printf("socket created...\n");
 
-    while (false == m_connected) {
+    while (false == m_connected)
+    {
         printf("awaiting connection of client...\n");
 
         m_connect_socket = accept(m_socket, NULL, NULL);
-        if (m_connect_socket == -1) {
+        if (m_connect_socket == -1)
+        {
             printf("Error while connecting");
             close(m_connect_socket);
             exit(1);
