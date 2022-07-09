@@ -22,7 +22,8 @@ std::error_code SocketConnection::connect()
 {
     // create unix domain stream socket
     m_socket = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (m_socket == -1){
+    if (m_socket == -1)
+    {
         printf("SOCKET ERROR: %d\n");
         exit(1);
     }
@@ -35,7 +36,8 @@ std::error_code SocketConnection::connect()
     // unlink the file so bind will succeed
     unlink(SOCK_PATH);
     rc = bind(m_socket, (struct sockaddr *) &sockaddress, len);
-    if (rc == -1){
+    if (rc == -1)
+    {
         printf("BIND ERROR: %d\n");
         close(m_socket);
         exit(1);

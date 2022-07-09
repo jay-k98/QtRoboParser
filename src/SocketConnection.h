@@ -38,14 +38,16 @@ public:
     {
         std::cout << "SIZE: " << SIZE << std::endl;
         bytes_rec = read(m_connect_socket, &buff[0], SIZE);
-        if (bytes_rec == -1){
+        if (bytes_rec == -1)
+        {
             printf("Read error");
             close(m_connect_socket);
             close(m_socket);
             return -1;
         }
 
-        if (bytes_rec == 0){
+        if (bytes_rec == 0)
+        {
             printf("Connection closed by client");
             close(m_connect_socket);
             close(m_socket);
