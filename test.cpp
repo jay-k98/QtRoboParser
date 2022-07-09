@@ -12,7 +12,7 @@
 #define BACKLOG 5
 #define DATA "Hello from server"
 
-using namespace std;
+
 
 int main() {
     // init variables

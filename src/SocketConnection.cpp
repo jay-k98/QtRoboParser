@@ -1,14 +1,24 @@
 #include "SocketConnection.h"
 
-SocketConnection::SocketConnection(const char* socketPath)
+SocketConnection::SocketConnection(const std::string& socketPath, bool& notTerminated)
 {
-    SOCK_PATH = socketPath;
+    SOCK_PATH = socketPath.c_str();
 
     // clear structs and buffer
     memset(&sockaddress, 0, sizeof(struct sockaddr_un));
 }
 
-int SocketConnection::connect()
+SocketConnection::~SocketConnection()
+{
+    unlink(SOCK_PATH);
+}
+
+bool SocketConnection::isConnected() const
+{
+    return m_connected;
+}
+
+std::error_code SocketConnection::connect()
 {
     // create unix domain stream socket
     m_socket = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -50,21 +60,4 @@ int SocketConnection::connect()
         }
         m_connected = true;
     }
-}
-
-int SocketConnection::readToBuffer(char buf[])
-{
-        bytes_rec = read(m_connect_socket, buf, 256);
-            //if (write(STDOUT_FILENO, buf, bytes_rec) != bytes_rec) {
-            //}
-        //}
-
-        if (bytes_rec == -1){
-            printf("Read error");
-            close(m_connect_socket);
-            close(m_socket);
-            exit(1);
-        }
-
-        return bytes_rec;
 }

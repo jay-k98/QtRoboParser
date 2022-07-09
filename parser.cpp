@@ -6,7 +6,7 @@
 #define SOCK_PATH  "/tmp/abc"
 #define DATA "Hello from server"
 
-using namespace std;
+
 
 struct qtRoboEvent {
     string eventName;
