@@ -1,12 +1,14 @@
 #pragma once
+
 #include <iostream>
-#include "QtRoboEventType.h"
+
+enum class QtRoboEventType { error, binary, proportional, mode, sub };
 
 class QtRoboEvent
 {
 private:
-    u_int8_t mEventChannel;
-    u_int8_t mEventValue;
+    uint8_t mEventChannel;
+    uint8_t mEventValue;
     QtRoboEventType mEventType;
 
 public:
