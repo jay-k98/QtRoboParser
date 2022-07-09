@@ -26,7 +26,7 @@ private:
     struct sockaddr_un sockaddress;
 
 public:
-    SocketConnection(const std::string& socketPath, bool& isTerminated);
+    SocketConnection(const std::string& socketPath, bool& notTerminated);
     ~SocketConnection();
 
     bool isConnected() const;
@@ -34,10 +34,10 @@ public:
     std::error_code connect();
 
     template<std::size_t SIZE>
-    int readToBuffer(std::array<char, SIZE> buff)
+    int readToBuffer(std::array<char, SIZE>& buff)
     {
+        std::cout << "SIZE: " << SIZE << std::endl;
         bytes_rec = read(m_connect_socket, &buff[0], SIZE);
-
         if (bytes_rec == -1){
             printf("Read error");
             close(m_connect_socket);

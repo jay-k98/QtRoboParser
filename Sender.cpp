@@ -1,15 +1,11 @@
 #include "Sender.h"
 #include <iostream>
 
-
-
-const std::string Sender::readBufferAsBytes(const uint8_t funcCode) {
-    std::string sumdBytes {""};
-    return sumdBytes;
-}
-
 void Sender::send(const std::array<uint8_t, 41> eventFrame) {
-    std::cout << eventFrame.at(0) << std::endl;
+    for (size_t i = 0; i < eventFrame.size(); i++)
+    {
+        std::cout << unsigned(eventFrame.at(i)) << std::endl;
+    }
 }
 
 std::array<uint8_t, 41> Sender::parseToSumd(const std::array<uint8_t, 32>& data, const Modes& modes, uint8_t functionCode) {

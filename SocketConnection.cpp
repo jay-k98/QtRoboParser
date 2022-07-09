@@ -1,6 +1,6 @@
 #include "SocketConnection.h"
 
-SocketConnection::SocketConnection(const std::string& socketPath, bool& isTerminated)
+SocketConnection::SocketConnection(const std::string& socketPath, bool& notTerminated)
 {
     SOCK_PATH = socketPath.c_str();
 

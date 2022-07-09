@@ -35,7 +35,7 @@ public:
     Parser(const ParserConfig& config);
     ~Parser() = default;
 
-    QtRoboEvent parseToQtRoboEvent(std::array<char, 256> buffer);
+    QtRoboEvent parseToQtRoboEvent(std::array<char, 256>& buffer);
 
     uint16_t crc16(uint16_t crc, uint8_t value);
 };

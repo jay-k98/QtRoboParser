@@ -10,12 +10,13 @@
 #define MIN_CHANNEL 0
 #define MAX_CHANNEL 95
 
-bool isTerminated = true;
+bool notTerminated = true;
 
 void signalHandler(int signum)
 {
     std::cout << "Signal: " << signum << std::endl;
-    isTerminated = false;
+    notTerminated = false;
+    exit(0);
 }
 
 int main(int argc, char const *argv[])
@@ -35,17 +36,19 @@ int main(int argc, char const *argv[])
     std::cout << parserConfig
          << argv[2] << "\n";
 
-    while (isTerminated)
+    while (notTerminated)
     {
-        SocketConnection socket{udsname, isTerminated};
+        SocketConnection socket{udsname, notTerminated};
         socket.connect();
 
         Buffer buffer{};
 
         Parser parser{parserConfig};
 
-        ReceiverThread receiver = ReceiverThread{socket, parser, buffer, isTerminated};
-        SenderThread sender = SenderThread{socket, buffer, isTerminated};
+        std::cout << socket.isConnected() << std::endl;
+
+        ReceiverThread receiver = ReceiverThread{socket, parser, buffer, notTerminated};
+        SenderThread sender = SenderThread{socket, buffer, notTerminated};
 
         std::thread receiverThread{receiver};
         std::thread senderThread{sender};
