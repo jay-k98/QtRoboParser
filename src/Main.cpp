@@ -27,14 +27,14 @@ int main(int argc, char const *argv[])
         std::cerr << "Please enter in the following order: [Prefix Prop] [Prefix Bin] [Prefix MODE] [Prefix SUB] [Name of the Unix Domain Socket]!" << std::endl;
         exit(1);
     }
-    // $ABC12:48
+
     // argv[0] contains the directory the application was started from
     // -> That is why we start from index 1
     ParserConfig parserConfig{argv[1], argv[2], argv[3], argv[4]};
     std::string udsname{argv[5]};
 
     std::cout << parserConfig
-         << argv[2] << "\n";
+         << udsname << "\n";
 
     while (notTerminated)
     {

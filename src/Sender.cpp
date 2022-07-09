@@ -4,7 +4,7 @@
 void Sender::send(const std::array<uint8_t, 41> eventFrame) {
     for (size_t i = 0; i < eventFrame.size(); i++)
     {
-        std::cout << unsigned(eventFrame.at(i)) << std::endl;
+        std::cout << "Byte " << i << ": " << unsigned(eventFrame.at(i)) << std::endl;
     }
 }
 
