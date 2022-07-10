@@ -32,4 +32,9 @@ Die SocketConnection Klasse erzeugt zu Beginn den Socket und akzeptiert eingehen
 
 
 == Threading
-Laut SumD Protokoll muss alle 10ms ein Frame mit einem Teil des Buffers versendet werden. Diese Funktionalität muss also in einen separat laufenden Thread ausgelagert werden, damit das Senden nicht durch eintreffende QtRoboEvents blockiert wird. Parser und Sender laufen daher in getrennten Threads und synchronisieren sich auf einen Buffer. Hier hat der Sender Priorität, da es besser ist einen veralteten Wert zu senden, anstatt die Spezifikation des SumD Protokolls zu brechen und gegebenenfalls Verbindungsprobleme zu verursachen
+Laut SumD Protokoll muss alle 10ms ein Frame mit einem Teil des Buffers versendet werden. Diese Funktionalität muss in einen separat laufenden Thread ausgelagert werden, damit das Senden nicht durch eintreffende QtRoboEvents blockiert wird. Parser und Sender laufen daher in getrennten Threads und synchronisieren sich auf einen Buffer. Hier hat der Sender Priorität, da es besser ist einen veralteten Wert zu senden, anstatt die Spezifikation des SumD Protokolls zu brechen und gegebenenfalls Verbindungsprobleme zu verursachen.
+
+Damit auf den gleichen Daten operiert wird, werden die Verbindung zum Socket, der Buffer, sowie der Indikator für die Beendigung der Anwendung durch den Nutzenden per Referenz übergeben.
+
+== Parser
+Der Parser nimmt sich jeweils eine Zeile aus dem Socket und parst deren Kanal und ggf. Wert in ein QtRoboEvent. Zu Beginn wurde dieser Parser als Zustandsautomat umgesetzt. Dieser bietet sich an, solange Eventtypen nur durch ihre Syntax unterscheidbar sind. Mit der Einführung der Präfixe pro Eventtyp ist diese Unterscheidung anhand der ersten Buchstaben möglich. Je nach Eventtyp wird mit einem regulären Ausdruck der Kanal und der neue Wert geparst. Hat der Eventtyp weder Kanal noch Wert, handelt es sich um den MODE_CMD bzw. den SUB_CMD Eventtyp. In diesem Fall bleiben wird nur der EventTyp im QtRoboEvent hinterlegt.
