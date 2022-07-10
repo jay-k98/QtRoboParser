@@ -10,28 +10,33 @@
 #include <string.h>
 #include <iostream>
 #include <array>
-#include <system_error>
 
-#define BACKLOG 5
+enum class SocketConnectionErr
+{
+    NONE = 0,
+    FATAL = 10, // Program should be terminated
+    RETRY = 20 // Problem caused by client -> retry connect()
+};
 
 class SocketConnection
 {
 private:
-    bool m_connected = false;
+    bool m_connected{false};
     const char* SOCK_PATH;
     int m_socket, m_connect_socket, rc;
     socklen_t len;
     int bytes_rec {0};
-    int backlog {10};
+    int backlog {5};
     struct sockaddr_un sockaddress;
 
+    SocketConnectionErr connect();
+
 public:
-    SocketConnection(const std::string& socketPath, bool& notTerminated);
+    SocketConnection(const std::string& socketPath);
     ~SocketConnection();
 
     bool isConnected() const;
-
-    std::error_code connect();
+    void start();
 
     template<std::size_t SIZE>
     int readToBuffer(std::array<char, SIZE>& buff)

@@ -12,6 +12,11 @@ struct ParserConfig
     std::string mode_prefix;
     std::string sub_prefix;
 
+    bool incomplete()
+    {
+        return prop_prefix.empty() || bin_prefix.empty() || mode_prefix.empty() || sub_prefix.empty();
+    }
+
     friend std::ostream& operator<<(std::ostream& out, const ParserConfig& cfg)
     {
         out << "Launched with the following arguments:\n"

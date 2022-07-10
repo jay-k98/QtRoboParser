@@ -1,15 +1,15 @@
 #include "SocketConnection.h"
 
-SocketConnection::SocketConnection(const std::string& socketPath, bool& notTerminated)
+SocketConnection::SocketConnection(const std::string& socketPath)
 {
     SOCK_PATH = socketPath.c_str();
-
-    // clear structs and buffer
     memset(&sockaddress, 0, sizeof(struct sockaddr_un));
 }
 
 SocketConnection::~SocketConnection()
 {
+    remove(SOCK_PATH);
+    close(m_socket);
     unlink(SOCK_PATH);
 }
 
@@ -18,14 +18,30 @@ bool SocketConnection::isConnected() const
     return m_connected;
 }
 
-std::error_code SocketConnection::connect()
+void SocketConnection::start()
+{
+    SocketConnectionErr errorCode{connect()};
+    while (SocketConnectionErr::NONE != errorCode)
+    {
+        if (SocketConnectionErr::FATAL == errorCode)
+        {
+            exit(1);
+        }
+        else if (SocketConnectionErr::RETRY == errorCode)
+        {
+            errorCode = connect();
+        }
+    }
+}
+
+SocketConnectionErr SocketConnection::connect()
 {
     // create unix domain stream socket
     m_socket = socket(AF_UNIX, SOCK_STREAM, 0);
     if (m_socket == -1)
     {
-        printf("SOCKET ERROR: %d\n");
-        exit(1);
+        std::cerr << "SOCKET ERROR: %d" << std::endl;
+        return SocketConnectionErr::FATAL;
     }
     
     // setup unix sockaddr struct 
@@ -38,31 +54,32 @@ std::error_code SocketConnection::connect()
     rc = bind(m_socket, (struct sockaddr *) &sockaddress, len);
     if (rc == -1)
     {
-        printf("BIND ERROR: %d\n");
+        std::cerr << "BIND ERROR: %d" << std::endl;
         close(m_socket);
-        exit(1);
+        unlink(SOCK_PATH);
+        return SocketConnectionErr::FATAL;
     }
 
-    if (listen(m_socket, BACKLOG) == -1)
+    if (listen(m_socket, backlog) == -1)
     {
-        printf("Error while listening");
+        std::cerr << "Error while listening" << std::endl;
         close(m_socket);
-        exit(1);
+        unlink(SOCK_PATH);
+        return SocketConnectionErr::RETRY;
     }
 
     printf("socket created...\n");
 
-    while (false == m_connected)
-    {
-        printf("awaiting connection of client...\n");
+    printf("awaiting connection of client...\n");
 
-        m_connect_socket = accept(m_socket, NULL, NULL);
-        if (m_connect_socket == -1)
-        {
-            printf("Error while connecting");
-            close(m_connect_socket);
-            exit(1);
-        }
-        m_connected = true;
+    m_connect_socket = accept(m_socket, NULL, NULL);
+    if (m_connect_socket == -1)
+    {
+        std::cerr << "Error while connecting" << std::endl;
+        close(m_connect_socket);
+        unlink(SOCK_PATH);
+        return SocketConnectionErr::RETRY;
     }
+    m_connected = true;
+    return SocketConnectionErr::NONE;
 }

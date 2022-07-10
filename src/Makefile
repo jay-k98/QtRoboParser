@@ -4,7 +4,7 @@ LDFLAGS=-lm
 
 Main : Main.o QtRoboEvent.o Parser.o SocketConnection.o Buffer.o Sender.o ReceiverThread.o SenderThread.o Crc.o
 
-Main.o : Main.cpp Parser.h QtRoboEvent.h SocketConnection.h
+Main.o : Main.cpp Parser.h QtRoboEvent.h SocketConnection.h lyra/lyra.hpp
 
 QtRoboEvent.o : QtRoboEvent.cpp QtRoboEvent.h
 
