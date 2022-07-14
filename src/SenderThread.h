@@ -9,10 +9,11 @@ class SenderThread
 private:
     SocketConnection& mSocketConnection;
     Buffer& mBuffer;
-    bool& m_NotTerminated;
+    bool& m_Terminated;
+    bool& m_debug;
 
 public:
-    SenderThread(SocketConnection& socketConnection, Buffer& buffer, bool& notTerminated);
+    SenderThread(SocketConnection& socketConnection, Buffer& buffer, bool& terminated, bool& debug);
     ~SenderThread() = default;
 
     SenderThread operator()();

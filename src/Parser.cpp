@@ -14,10 +14,9 @@ Parser::Parser(const ParserConfig& config)
 // $MODE
 // $Bin48
 // $SUB
-QtRoboEvent Parser::parseToQtRoboEvent(std::array<char, 256>& buffer) {
+QtRoboEvent Parser::parseToQtRoboEvent(std::array<char, 256>& buffer)
+{
     std::string line {std::begin(buffer), std::end(buffer)};
-    
-    std::cout << "Read: " << buffer.at(0) << std::endl;
 
     if (line.at(0) == '$')
     {

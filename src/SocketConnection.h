@@ -10,49 +10,68 @@
 #include <string.h>
 #include <iostream>
 #include <array>
-#include <system_error>
+#include <errno.h>
 
-#define BACKLOG 5
+enum class SocketConnectionErr
+{
+    NONE,
+    FATAL,
+    RETRY,
+    TERMINATED
+};
+
+enum class SocketReadErr
+{
+    DATA_READ,
+    NOTHING_TO_READ,
+    CONNECTION_CLOSED,
+    READ_ERROR
+};
 
 class SocketConnection
 {
 private:
-    bool m_connected = false;
+    bool m_Connected{false};
+    bool& m_Terminated;
     const char* SOCK_PATH;
-    int m_socket, m_connect_socket, rc;
+    int m_Socket, m_Connect_Socket, rc;
     socklen_t len;
     int bytes_rec {0};
-    int backlog {10};
+    int backlog {5};
     struct sockaddr_un sockaddress;
 
 public:
-    SocketConnection(const std::string& socketPath, bool& notTerminated);
+    SocketConnection(const std::string& socketPath, bool& terminated);
     ~SocketConnection();
 
     bool isConnected() const;
-
-    std::error_code connect();
+    SocketConnectionErr connect();
 
     template<std::size_t SIZE>
-    int readToBuffer(std::array<char, SIZE>& buff)
+    SocketReadErr readToBuffer(std::array<char, SIZE>& buff)
     {
-        std::cout << "SIZE: " << SIZE << std::endl;
-        bytes_rec = read(m_connect_socket, &buff[0], SIZE);
-        if (bytes_rec == -1){
-            printf("Read error");
-            close(m_connect_socket);
-            close(m_socket);
-            return -1;
+        bytes_rec = read(m_Connect_Socket, &buff[0], SIZE);
+        if (-1 == bytes_rec && EAGAIN == errno)
+        {
+            return SocketReadErr::NOTHING_TO_READ;
         }
-
-        if (bytes_rec == 0){
-            printf("Connection closed by client");
-            close(m_connect_socket);
-            close(m_socket);
+        else if (-1 == bytes_rec)
+        {
+            std::cerr << "Read error" << std::endl;
+            close(m_Connect_Socket);
+            close(m_Socket);
+            return SocketReadErr::READ_ERROR;
+        }
+        else if (0 == bytes_rec)
+        {
+            std::cerr << "Connection closed by client" << std::endl;
+            close(m_Connect_Socket);
+            close(m_Socket);
             unlink(SOCK_PATH);
-            m_connected = false;
+            m_Connected = false;
+            return SocketReadErr::CONNECTION_CLOSED;
         }
 
-        return bytes_rec;
+        return SocketReadErr::DATA_READ;
     }
 };

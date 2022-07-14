@@ -1,14 +1,25 @@
 #include "Sender.h"
 #include <iostream>
+#include <bitset>
 
-void Sender::send(const std::array<uint8_t, 41> eventFrame) {
+void Sender::send(const std::array<uint8_t, 41> eventFrame, bool debug)
+{
     for (size_t i = 0; i < eventFrame.size(); i++)
     {
-        std::cout << unsigned(eventFrame.at(i)) << std::endl;
+        if (debug)
+        {
+            std::cout << unsigned(eventFrame.at(i)) << std::endl;
+        }
+        else
+        {
+            std::bitset<8> bits(i);
+            std::cout << bits;
+        }
     }
 }
 
-std::array<uint8_t, 41> Sender::parseToSumd(const std::array<uint8_t, 32>& data, const Modes& modes, uint8_t functionCode) {
+std::array<uint8_t, 41> Sender::parseToSumd(const std::array<uint8_t, 32>& data, const Modes& modes, uint8_t functionCode)
+{
     // 3 Bytes for Header
     // 16 x 2 = 32 Bytes for data
     // 4 Bytes for Func Code, Last valid packages, MODE CMD, SUB CMD

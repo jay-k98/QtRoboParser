@@ -1,0 +1,181 @@
+{
+    "layout": [
+        {
+            "content": [
+                {
+                    "componentColor": {
+                        "a": 1,
+                        "b": 0.7098039215686275,
+                        "g": 0.3176470588235294,
+                        "hslHue": 0.64125,
+                        "hslLightness": 0.47843137254901963,
+                        "hslSaturation": 0.4836041809719997,
+                        "hsvHue": 0.64125,
+                        "hsvSaturation": 0.6519264515144579,
+                        "hsvValue": 0.7098039215686275,
+                        "r": 0.24705882352941178,
+                        "valid": true
+                    },
+                    "componentType": 2,
+                    "decreaseShortcut": "",
+                    "eventName": "prop10",
+                    "fontColor": {
+                        "a": 1,
+                        "b": 0,
+                        "g": 0,
+                        "hslHue": -1,
+                        "hslLightness": 0,
+                        "hslSaturation": 0,
+                        "hsvHue": -1,
+                        "hsvSaturation": 0,
+                        "hsvValue": 0,
+                        "r": 0,
+                        "valid": true
+                    },
+                    "height": 30,
+                    "increaseShortcut": "",
+                    "initialValue": 0,
+                    "inputScript": "",
+                    "isBalanced": false,
+                    "label": "Proportional",
+                    "mappedMaximumValue": 100,
+                    "mappedMinimumValue": 0,
+                    "maximumValue": 100,
+                    "minimumValue": 0,
+                    "orientation": 1,
+                    "outputScript": "",
+                    "showValue": true,
+                    "width": 200,
+                    "x": 418,
+                    "y": 266
+                },
+                {
+                    "componentColor": {
+                        "a": 1,
+                        "b": 0.8274509803921568,
+                        "g": 0.8274509803921568,
+                        "hslHue": -1,
+                        "hslLightness": 0.8274509803921568,
+                        "hslSaturation": 0,
+                        "hsvHue": -1,
+                        "hsvSaturation": 0,
+                        "hsvValue": 0.8274509803921568,
+                        "r": 0.8274509803921568,
+                        "valid": true
+                    },
+                    "componentType": 0,
+                    "eventName": "bin64",
+                    "fontColor": {
+                        "a": 1,
+                        "b": 0,
+                        "g": 0,
+                        "hslHue": -1,
+                        "hslLightness": 0,
+                        "hslSaturation": 0,
+                        "hsvHue": -1,
+                        "hsvSaturation": 0,
+                        "hsvValue": 0,
+                        "r": 0,
+                        "valid": true
+                    },
+                    "height": 50,
+                    "label": "Binary",
+                    "outputScript": "",
+                    "shortcut": "",
+                    "width": 200,
+                    "x": 411,
+                    "y": 110
+                },
+                {
+                    "componentColor": {
+                        "a": 1,
+                        "b": 0.8274509803921568,
+                        "g": 0.8274509803921568,
+                        "hslHue": -1,
+                        "hslLightness": 0.8274509803921568,
+                        "hslSaturation": 0,
+                        "hsvHue": -1,
+                        "hsvSaturation": 0,
+                        "hsvValue": 0.8274509803921568,
+                        "r": 0.8274509803921568,
+                        "valid": true
+                    },
+                    "componentType": 0,
+                    "eventName": "mode",
+                    "fontColor": {
+                        "a": 1,
+                        "b": 0,
+                        "g": 0,
+                        "hslHue": -1,
+                        "hslLightness": 0,
+                        "hslSaturation": 0,
+                        "hsvHue": -1,
+                        "hsvSaturation": 0,
+                        "hsvValue": 0,
+                        "r": 0,
+                        "valid": true
+                    },
+                    "height": 50,
+                    "label": "Mode",
+                    "outputScript": "",
+                    "shortcut": "",
+                    "width": 200,
+                    "x": 167,
+                    "y": 426
+                },
+                {
+                    "componentColor": {
+                        "a": 1,
+                        "b": 0.8274509803921568,
+                        "g": 0.8274509803921568,
+                        "hslHue": -1,
+                        "hslLightness": 0.8274509803921568,
+                        "hslSaturation": 0,
+                        "hsvHue": -1,
+                        "hsvSaturation": 0,
+                        "hsvValue": 0.8274509803921568,
+                        "r": 0.8274509803921568,
+                        "valid": true
+                    },
+                    "componentType": 0,
+                    "eventName": "sub",
+                    "fontColor": {
+                        "a": 1,
+                        "b": 0,
+                        "g": 0,
+                        "hslHue": -1,
+                        "hslLightness": 0,
+                        "hslSaturation": 0,
+                        "hsvHue": -1,
+                        "hsvSaturation": 0,
+                        "hsvValue": 0,
+                        "r": 0,
+                        "valid": true
+                    },
+                    "height": 50,
+                    "label": "Sub",
+                    "outputScript": "",
+                    "shortcut": "",
+                    "width": 200,
+                    "x": 657,
+                    "y": 427
+                }
+            ],
+            "eventName": "",
+            "eventValue": "",
+            "tabIndex": 0,
+            "tabName": ""
+        }
+    ],
+    "settings": {
+        "localsocket": {
+            "socketName": "/tmp/abc"
+        },
+        "serialport": {
+            "serialBaudrate": 9600,
+            "serialInterfaceName": "",
+            "serialParitybit": 0,
+            "serialStopbit": 1
+        }
+    }
+}

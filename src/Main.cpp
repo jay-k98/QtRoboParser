@@ -1,3 +1,4 @@
+#include "lyra/lyra.hpp"
 #include "Parser.h"
 #include "QtRoboEvent.h"
 #include "SocketConnection.h"
@@ -7,55 +8,82 @@
 #include "ReceiverThread.h"
 #include "SenderThread.h"
 
-#define MIN_CHANNEL 0
-#define MAX_CHANNEL 95
-
-bool notTerminated = true;
+bool terminated = false;
+bool debug = false;
 
 void signalHandler(int signum)
 {
-    std::cout << "Signal: " << signum << std::endl;
-    notTerminated = false;
-    exit(0);
+    terminated = true;
 }
 
 int main(int argc, char const *argv[])
 {
     signal(SIGINT, signalHandler);
-    if (argc != 6)
+
+    ParserConfig parserConfig{};
+    std::string udsname{};
+    bool show_help{false};
+
+    auto cli{lyra::help(show_help)
+        | lyra::opt(parserConfig.bin_prefix, "binary prefix")
+                ["-b"]["--bin"]("What prefix is used for binary events?")
+        | lyra::opt(parserConfig.prop_prefix, "proportional prefix")
+                ["-p"]["--prop"]("What prefix is used for proportional events?")
+        | lyra::opt(parserConfig.mode_prefix, "mode prefix")
+                ["-m"]["--mode"]("What prefix is used for the mode event?")
+        | lyra::opt(parserConfig.sub_prefix, "sub prefix")
+                ["-s"]["--sub"]("What prefix is used for the sub event?")
+        | lyra::opt(udsname, "unix domain socket name")
+                ["-u"]["--uds"]("Where should the unix domain socket be created?")
+        | lyra::opt(debug, "true -> debug enabled, false -> debug disabled")
+                ["-d"]["--debug"]("Should debug output be enabled?")};
+
+    auto result{cli.parse({ argc, argv })};
+    bool emptyValues{parserConfig.incomplete() || udsname.empty()};
+    show_help = show_help || !result || emptyValues;
+
+    if (show_help)
     {
-        std::cerr << "Please enter in the following order: [Prefix Prop] [Prefix Bin] [Prefix MODE] [Prefix SUB] [Name of the Unix Domain Socket]!" << std::endl;
-        exit(1);
-    }
-    // $ABC12:48
-    // argv[0] contains the directory the application was started from
-    // -> That is why we start from index 1
-    ParserConfig parserConfig{argv[1], argv[2], argv[3], argv[4]};
-    std::string udsname{argv[5]};
-
-    std::cout << parserConfig
-         << argv[2] << "\n";
-
-    while (notTerminated)
-    {
-        SocketConnection socket{udsname, notTerminated};
-        socket.connect();
-
-        Buffer buffer{};
-
-        Parser parser{parserConfig};
-
-        std::cout << socket.isConnected() << std::endl;
-
-        ReceiverThread receiver = ReceiverThread{socket, parser, buffer, notTerminated};
-        SenderThread sender = SenderThread{socket, buffer, notTerminated};
-
-        std::thread receiverThread{receiver};
-        std::thread senderThread{sender};
-
-        receiverThread.join();
-        senderThread.join();
+	std::cout << cli << std::endl;
+	exit(1);
     }
 
+    std::cout << parserConfig << "Location of Unix Domain Socket: " << udsname << std::endl;
+
+    while (!terminated)
+    {
+        SocketConnection socket{udsname, terminated};
+        SocketConnectionErr errorCode{socket.connect()};
+        while (SocketConnectionErr::NONE != errorCode)
+        {
+            if (SocketConnectionErr::FATAL == errorCode)
+            {
+                exit(1);
+            }
+            else if (SocketConnectionErr::RETRY == errorCode)
+            {
+                errorCode = socket.connect();
+            }
+            else if (SocketConnectionErr::TERMINATED == errorCode)
+            {
+                break;
+            }
+        }
+
+        if (!terminated)
+        {
+            Buffer buffer{};
+            Parser parser{parserConfig};
+
+            ReceiverThread receiver{socket, parser, buffer, terminated};
+            SenderThread sender{socket, buffer, terminated, debug};
+
+            std::thread receiverThread{receiver};
+            std::thread senderThread{sender};
+
+            receiverThread.join();
+            senderThread.join();
+        }
+    }
     return 0;
 }
