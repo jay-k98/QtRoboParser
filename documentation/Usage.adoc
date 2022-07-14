@@ -18,7 +18,7 @@ QtRobo muss zum Senden von Events verwendet werden.
 Voraussetzung zum Bauen der Applikation ist die Installation von make zusammen mit einem {cpp} Compiler. Das Projekt enthält ein Makefile. Dieses beschreibt die zum Bauen der Applikation benötigten Schritte für den verwendeten {cpp} Compiler. Solange make installiert ist, ermöglicht das Ausführen des Kommandos make im ./src Verzeichnis des Projekts auf dem Terminal die Erstellung der verschiedenen Object Dateien (.o) und das anschließende linken zur Main executable.
 
 == Funktionsweise
-QtRoboParser erstellt einen Unix Domain Socket und wartet auf eine Verbindung von QtRobo. Sobald eine Zeile auf dem Socket übertragen wird, parst QtRoboParser diese in ein Event, welches den internen mit 0 für proportionale und false für binäre Kanäle initialisierten Buffer verändert. Gleichzeitig wird bei Verbindung eines Clients das Senden der sumD Event-Frames auf den Standard Output gestartet. Jeder Name eines Controls in QtRobo muss deshalb dem folgenden Schema entsprechen:
+QtRoboParser erstellt einen Unix Domain Socket und wartet auf eine Verbindung von QtRobo. Sobald eine Zeile auf dem Socket übertragen wird, parst QtRoboParser diese in ein Event, welches den internen mit 0 für proportionale und false für binäre Kanäle initialisierten Buffer verändert. Gleichzeitig wird bei Verbindung eines Clients das Senden der SumD Event-Frames auf den Standard Output gestartet. Jeder Name eines Controls in QtRobo muss deshalb dem folgenden Schema entsprechen:
 
 [Präfix][Name][Kanal]
 
@@ -26,7 +26,7 @@ QtRoboParser erstellt einen Unix Domain Socket und wartet auf eine Verbindung vo
 image::QtRobo_eventName.png[75%]
 
 == Starten der Anwendung
-QtRoboParser ist eine Kommandozeilenanwendung. Sie wird deshalb auf dem Terminal über den Befehl ./Main gestartet. Die Anwendung muss zum Starten die in QtRobo für die einzelnen Controls verwendeten Präfixe übergeben bekommen. Außerdem ist der Pfad unter dem der Unix Domain Socket angelegt werden soll konfigurierbar.
+QtRoboParser ist eine Kommandozeilenanwendung. Sie wird deshalb auf dem Terminal über den Befehl ./Main gestartet. Die Anwendung muss zum Starten die in QtRobo für die einzelnen Controls verwendeten Präfixe übergeben bekommen. Außerdem ist der Pfad, unter dem der Unix Domain Socket angelegt werden soll, konfigurierbar.
 
 Die genaue Syntax des Aufrufs kann mit ./Main -h|--help angezeigt werden.
 
@@ -34,7 +34,7 @@ Danach wartet die Anwendung auf die Verbindung eines Clients. In QtRobo muss des
 
 *Achtung:* QtRobo sendet bei zu langen Eventnamen unlesbare Informationen an den Socket. Präfixe und Namen sollten entsprechend kurz gewählt werden.
 
-Auf dem Terminal in dem QtRoboParser gestartet wurde, sollten anschließend sumD Event Frames geschrieben werden. Sollte etwas nicht funktioniert haben, gibt die Anwendung eine Fehlerbeschreibung auf dem Standard Error Output aus. Ist die Option -d bzw. --debug true gesetzt, ist die Ausgabe lesbar. Im normalem Betrieb werden zur Verwendung von Pipes zur Kommunikation mit anderen Unix Prozessen nicht lesbare Binärdaten ausgegeben.
+Auf dem Terminal in dem QtRoboParser gestartet wurde, sollten anschließend SumD Event Frames geschrieben werden. Sollte etwas nicht funktioniert haben, gibt die Anwendung eine Fehlerbeschreibung auf dem Standard Error Output aus. Ist die Option -d bzw. --debug true gesetzt, ist die Ausgabe lesbar. Im normalem Betrieb werden zur Verwendung von Pipes zur Kommunikation mit anderen Unix Prozessen nicht lesbare Binärdaten ausgegeben.
 
 == Beispiel
 Ein zur Demonstration aller Eventtypen erstelltes QtRobo Layout ist in diesem Projekt als TestLayout zu finden. Diese kann in QtRobo geöffnet und nach der Verbindung mit dem vorkonfigurierten Socket /tmp/abc verwendet werden.
