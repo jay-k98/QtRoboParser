@@ -49,8 +49,8 @@ void Buffer::reactToQtRoboEvent(QtRoboEvent event)
         else if (event.eventChannel() >= propBreak && event.eventChannel() < propEnd)
         {
             std::lock_guard<std::mutex> guard(mutex_func03);
-            funcCode03.at(index) = 0x00;
-            funcCode03.at(index + 1) = event.eventValue();
+            funcCode03.at(index - propEnd) = 0x00;
+            funcCode03.at(index - propEnd + 1) = event.eventValue();
         }
         else
         {
