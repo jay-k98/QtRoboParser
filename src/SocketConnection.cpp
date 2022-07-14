@@ -1,6 +1,9 @@
 #include "SocketConnection.h"
+#include <fcntl.h>
+#include <errno.h>
 
-SocketConnection::SocketConnection(const std::string& socketPath)
+SocketConnection::SocketConnection(const std::string& socketPath, bool& terminated)
+: m_terminated{terminated}
 {
     SOCK_PATH = socketPath.c_str();
     memset(&sockaddress, 0, sizeof(struct sockaddr_un));
@@ -8,9 +11,9 @@ SocketConnection::SocketConnection(const std::string& socketPath)
 
 SocketConnection::~SocketConnection()
 {
-    remove(SOCK_PATH);
     close(m_socket);
     unlink(SOCK_PATH);
+    remove(SOCK_PATH);
 }
 
 bool SocketConnection::isConnected() const
@@ -18,29 +21,15 @@ bool SocketConnection::isConnected() const
     return m_connected;
 }
 
-void SocketConnection::start()
-{
-    SocketConnectionErr errorCode{connect()};
-    while (SocketConnectionErr::NONE != errorCode)
-    {
-        if (SocketConnectionErr::FATAL == errorCode)
-        {
-            exit(1);
-        }
-        else if (SocketConnectionErr::RETRY == errorCode)
-        {
-            errorCode = connect();
-        }
-    }
-}
-
 SocketConnectionErr SocketConnection::connect()
 {
     // create unix domain stream socket
     m_socket = socket(AF_UNIX, SOCK_STREAM, 0);
+    int socketFlags = fcntl(m_socket, F_GETFL, 0);
+    fcntl(m_socket, F_SETFL, socketFlags | O_NONBLOCK);
     if (m_socket == -1)
     {
-        std::cerr << "SOCKET ERROR: %d" << std::endl;
+        std::cerr << "SOCKET ERROR: " << errno << std::endl;
         return SocketConnectionErr::FATAL;
     }
     
@@ -54,32 +43,31 @@ SocketConnectionErr SocketConnection::connect()
     rc = bind(m_socket, (struct sockaddr *) &sockaddress, len);
     if (rc == -1)
     {
-        std::cerr << "BIND ERROR: %d" << std::endl;
+        std::cerr << "BIND ERROR: " << errno << std::endl;
         close(m_socket);
         unlink(SOCK_PATH);
         return SocketConnectionErr::FATAL;
     }
 
+    std::cout << "socket created..." << std::endl;
+
     if (listen(m_socket, backlog) == -1)
     {
-        std::cerr << "Error while listening" << std::endl;
+        std::cerr << "LISTEN ERROR: " << errno << std::endl;
         close(m_socket);
         unlink(SOCK_PATH);
         return SocketConnectionErr::RETRY;
     }
 
-    printf("socket created...\n");
+    std::cout << "awaiting connection of client..." << std::endl;
 
-    printf("awaiting connection of client...\n");
-
-    m_connect_socket = accept(m_socket, NULL, NULL);
-    if (m_connect_socket == -1)
+    while (!m_terminated)
     {
-        std::cerr << "Error while connecting" << std::endl;
-        close(m_connect_socket);
-        unlink(SOCK_PATH);
-        return SocketConnectionErr::RETRY;
+        m_connect_socket = accept4(m_socket, NULL, NULL, O_NONBLOCK);
+        if (m_connect_socket != -1)
+        {
+            m_connected = true;
+            return SocketConnectionErr::NONE;
+        }
     }
-    m_connected = true;
-    return SocketConnectionErr::NONE;
 }

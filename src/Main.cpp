@@ -8,11 +8,12 @@
 #include "ReceiverThread.h"
 #include "SenderThread.h"
 
-bool notTerminated = true;
+bool terminated = false;
+bool debug = false;
 
 void signalHandler(int signum)
 {
-    notTerminated = false;
+    terminated = true;
 }
 
 int main(int argc, char const *argv[])
@@ -33,7 +34,9 @@ int main(int argc, char const *argv[])
         | lyra::opt(parserConfig.sub_prefix, "sub prefix")
                 ["-s"]["--sub"]("What prefix is used for the sub event?")
         | lyra::opt(udsname, "unix domain socket name")
-                ["-u"]["--uds"]("Where should the unix domain socket be created?")};
+                ["-u"]["--uds"]("Where should the unix domain socket be created?")
+        | lyra::opt(debug, "true -> debug enabled, false -> debug disabled")
+                ["-d"]["--debug"]("Should debug output be enabled?")};
 
     auto result{cli.parse({ argc, argv })};
     bool emptyValues{parserConfig.incomplete() || udsname.empty()};
@@ -41,29 +44,42 @@ int main(int argc, char const *argv[])
 
     if (show_help)
     {
-	    std::cout << cli << std::endl;
-	    exit(1);
+	std::cout << cli << std::endl;
+	exit(1);
     }
 
     std::cout << parserConfig << udsname << std::endl;
 
-    while (notTerminated)
+    while (!terminated)
     {
-        SocketConnection socket{udsname};
-        socket.start();
+        SocketConnection socket{udsname, terminated};
+        SocketConnectionErr errorCode{socket.connect()};
+        while (SocketConnectionErr::NONE != errorCode)
+        {
+            if (SocketConnectionErr::FATAL == errorCode)
+            {
+                exit(1);
+            }
+            else if (SocketConnectionErr::RETRY == errorCode)
+            {
+                errorCode = socket.connect();
+            }
+        }
 
-        Buffer buffer{};
-        Parser parser{parserConfig};
+        if (!terminated)
+        {
+            Buffer buffer{};
+            Parser parser{parserConfig};
 
-        ReceiverThread receiver{ReceiverThread{socket, parser, buffer, notTerminated}};
-        SenderThread sender{SenderThread{socket, buffer, notTerminated}};
+            ReceiverThread receiver{socket, parser, buffer, terminated};
+            SenderThread sender{socket, buffer, terminated, debug};
 
-        std::thread receiverThread{receiver};
-        std::thread senderThread{sender};
+            std::thread receiverThread{receiver};
+            std::thread senderThread{sender};
 
-        receiverThread.join();
-        senderThread.join();
+            receiverThread.join();
+            senderThread.join();
+        }
     }
-
     return 0;
 }

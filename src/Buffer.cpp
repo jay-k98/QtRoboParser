@@ -32,10 +32,10 @@ const Modes Buffer::modes()
 
 void Buffer::reactToQtRoboEvent(QtRoboEvent event)
 {
-    constexpr int propBreak {16};
-    constexpr int propEnd {32};
-    constexpr int binBreak {64};
-    constexpr int binEnd {96};
+    constexpr uint8_t propBreak {16};
+    constexpr uint8_t propEnd {32};
+    constexpr uint8_t binBreak {64};
+    constexpr uint8_t binEnd {96};
     
     if (QtRoboEventType::proportional == event.eventType())
     {
@@ -59,7 +59,7 @@ void Buffer::reactToQtRoboEvent(QtRoboEvent event)
     }
     else if (QtRoboEventType::binary == event.eventType())
     {
-        size_t index{event.eventChannel() - unsigned(propEnd) - 1};
+        size_t index{event.eventChannel() - propEnd - 1U};
         if (event.eventChannel() >= propEnd && event.eventChannel() < binBreak)
         {
             std::lock_guard<std::mutex> guard(mutex_func04);

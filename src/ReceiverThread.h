@@ -12,10 +12,10 @@ private:
     SocketConnection& m_SocketConnection;
     Parser& m_Parser;
     Buffer& m_Buffer;
-    bool& m_NotTerminated;
+    bool& m_Terminated;
     
 public:
-    ReceiverThread(SocketConnection& socketConnection, Parser& parser, Buffer& buffer, bool& notTerminated);
+    ReceiverThread(SocketConnection& socketConnection, Parser& parser, Buffer& buffer, bool& terminated);
     ~ReceiverThread() = default;
 
     ReceiverThread operator()();

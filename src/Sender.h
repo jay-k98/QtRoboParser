@@ -14,6 +14,6 @@ class Sender
         Sender(Sender& orig) = delete;
         Sender& operator=(Sender& orig) = delete;
 
-        static void send(const std::array<uint8_t, 41> buffer);
+        static void send(const std::array<uint8_t, 41> buffer, bool debug);
         static std::array<uint8_t, 41> parseToSumd(const std::array<uint8_t, 32>& data, const Modes& modes, uint8_t functionCode);
 };
