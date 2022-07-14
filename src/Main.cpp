@@ -48,7 +48,7 @@ int main(int argc, char const *argv[])
 	exit(1);
     }
 
-    std::cout << parserConfig << udsname << std::endl;
+    std::cout << parserConfig << "Location of Unix Domain Socket: " << udsname << std::endl;
 
     while (!terminated)
     {
@@ -63,6 +63,10 @@ int main(int argc, char const *argv[])
             else if (SocketConnectionErr::RETRY == errorCode)
             {
                 errorCode = socket.connect();
+            }
+            else if (SocketConnectionErr::TERMINATED == errorCode)
+            {
+                break;
             }
         }
 

@@ -20,10 +20,10 @@ struct ParserConfig
     friend std::ostream& operator<<(std::ostream& out, const ParserConfig& cfg)
     {
         out << "Launched with the following arguments:\n"
-         << cfg.prop_prefix << "\n"
-         << cfg.bin_prefix << "\n"
-         << cfg.mode_prefix << "\n"
-         << cfg.sub_prefix << "\n";
+         << "Prop prefix: " << cfg.prop_prefix << "\n"
+         << "Bin prefix: " << cfg.bin_prefix << "\n"
+         << "Mode prefix: " << cfg.mode_prefix << "\n"
+         << "Sub prefix: " << cfg.sub_prefix << "\n";
         return out;
     }
 };

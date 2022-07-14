@@ -7,9 +7,9 @@ enum class QtRoboEventType { error, binary, proportional, mode, sub };
 class QtRoboEvent
 {
 private:
-    uint8_t mEventChannel;
-    uint8_t mEventValue;
-    QtRoboEventType mEventType;
+    uint8_t m_EventChannel;
+    uint8_t m_EventValue;
+    QtRoboEventType m_EventType;
 
 public:
     QtRoboEvent() = default;
@@ -17,14 +17,14 @@ public:
     ~QtRoboEvent() = default;
 
     uint8_t eventChannel() const {
-        return mEventChannel;
+        return m_EventChannel;
     }
 
     uint8_t eventValue() const {
-        return mEventValue;
+        return m_EventValue;
     }
 
     QtRoboEventType eventType() const {
-        return mEventType;
+        return m_EventType;
     }
 };

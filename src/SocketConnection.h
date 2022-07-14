@@ -16,7 +16,8 @@ enum class SocketConnectionErr
 {
     NONE,
     FATAL,
-    RETRY
+    RETRY,
+    TERMINATED
 };
 
 enum class SocketReadErr
@@ -30,10 +31,10 @@ enum class SocketReadErr
 class SocketConnection
 {
 private:
-    bool m_connected{false};
-    bool& m_terminated;
+    bool m_Connected{false};
+    bool& m_Terminated;
     const char* SOCK_PATH;
-    int m_socket, m_connect_socket, rc;
+    int m_Socket, m_Connect_Socket, rc;
     socklen_t len;
     int bytes_rec {0};
     int backlog {5};
@@ -49,7 +50,7 @@ public:
     template<std::size_t SIZE>
     SocketReadErr readToBuffer(std::array<char, SIZE>& buff)
     {
-        bytes_rec = read(m_connect_socket, &buff[0], SIZE);
+        bytes_rec = read(m_Connect_Socket, &buff[0], SIZE);
         if (-1 == bytes_rec && EAGAIN == errno)
         {
             return SocketReadErr::NOTHING_TO_READ;
@@ -57,17 +58,17 @@ public:
         else if (-1 == bytes_rec)
         {
             std::cerr << "Read error" << std::endl;
-            close(m_connect_socket);
-            close(m_socket);
+            close(m_Connect_Socket);
+            close(m_Socket);
             return SocketReadErr::READ_ERROR;
         }
-        else if (bytes_rec == 0)
+        else if (0 == bytes_rec)
         {
             std::cerr << "Connection closed by client" << std::endl;
-            close(m_connect_socket);
-            close(m_socket);
+            close(m_Connect_Socket);
+            close(m_Socket);
             unlink(SOCK_PATH);
-            m_connected = false;
+            m_Connected = false;
             return SocketReadErr::CONNECTION_CLOSED;
         }
 
