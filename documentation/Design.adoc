@@ -1,0 +1,40 @@
+:author: Klock, Jonas; Krämer, Desmond; Fernau, Jan
+:email: jokl0009@stud.hs-kl.de; dekr0012@stud.hs-kl.de; jafe0006@stud.hs-kl.de
+:date: {docdate}
+:revision: 0.0.1
+
+= Designentscheidungen
+
+== Zweck des Dokuments
+Dies ist eine Erläuterung der für das Kommandozeilenprogramm QtRoboToSumD getroffenen Designentscheidungen.
+
+== Zielplattform
+Das Programm ist nur für Unix basierte Systeme verwendbar, da es die Events von QtRobo auf einem erstellten Unix Domain Socket entgegennimmt. Unix Domain Sockets sind seit dem Insider Build 17063 zwar auch unter Windows mit einer laut Microsoft möglichst kompatiblen Implementierung verfügbar, allerdings wurde QtRoboToSumD nur unter Linux getestet, wodurch keine Informationen zu notwendigen Anpassungen für eine Portierung bestehen.
+
+== Interaktion mit dem Nutzenden
+Vorgabe für QtRoboToSumD ist es möglichst flexibel zu sein. Deshalb sind der für die Events verwendete Präfix und der Pfad zum verwendeten Socket konfigurierbar. QtRoboToSumD besitzt keine grafische Benutzeroberfläche, da die Verwendung im Terminal vorgesehen ist, um die SumD Frames an andere Unix Kommandos weiterleiten zu können. Die Konfiguration muss folglich über das Kommandozeileninterface erfolgen.
+
+== Programmiertechnik
+QtRoboToSumD ist in {cpp} geschrieben. Es wurde darauf geachtet {cpp} Datenstrukturen zu verwenden. Das bedeutet dass zum Beispiel std::array und std::vector anstatt von rohen C Arrays eingesetzt werden. Desweiteren wurde darauf geachtet Parameter wenn möglich als konstante Referenzen (const&) zu übergeben, alle Objekte uniform mit geschweiften Klammern anstatt runden Klammern zu initialisieren sowie Konstanten als konstante Ausdrücke zu definieren (constexpr).
+
+Das fördert die Verständlichkeit und Lesbarkeit des Quellcodes. In C typische Fehler wie Zugriff auf Speicheradressen außerhalb des definierten Arrays werden durch diese Designentscheidungen vermieden.
+
+== Klassenlayout
+Die Anwendung erstellt einen Socket an dem per Kommandozeilenparameter übergebenen Pfad und wartet auf eine Verbindung von einer Gegenstelle. Die dort eingehenden Zeilen werden einzeln in QtRoboEvents geparst, die die standardmäßig auf 0 für proportionale bzw. false für binäre Controls gesetzten Werte, verändern. Dieser Buffer muss in mehreren Teilen verschickt werden. Diese sind im sumD Protokoll festgelegt.
+
+Dementsprechend gibt es mehrere Möglichkeiten die Applikation in Klassen zu unterteilen. Um der Domäne zu entsprechen wurde sich für eine SocketConnection Klasse, eine Parser Klasse und eine Sender Klasse entschieden. Parser und Sender operieren auf der Datenstruktur Buffer, die bereits in die im SumD Protokoll definierten Chunks unterscheidet. Ein QtRoboEvent bezieht sich bereits auf einen bestimmten Index im Buffer, die Einsortierung ist daher leicht möglich. Beim Versenden muss dadurch auch kein Array in mehrere Teile geschnitten werden.
+
+Die SocketConnection Klasse erzeugt zu Beginn den Socket und akzeptiert eingehende Verbindungen. Wird eine Verbindung beendet, löscht sie den Buffer und wartet auf eine erneute Verbindung eines Clients.
+
+// TODO: UML-Diagramm
+
+== Datenstrukturen
+
+
+== Threading
+Laut SumD Protokoll muss alle 10ms ein Frame mit einem Teil des Buffers versendet werden. Diese Funktionalität muss in einen separat laufenden Thread ausgelagert werden, damit das Senden nicht durch eintreffende QtRoboEvents blockiert wird. Parser und Sender laufen daher in getrennten Threads und synchronisieren sich auf einen Buffer. Hier hat der Sender Priorität, da es besser ist einen veralteten Wert zu senden, anstatt die Spezifikation des SumD Protokolls zu brechen und gegebenenfalls Verbindungsprobleme zu verursachen.
+
+Damit auf den gleichen Daten operiert wird, werden die Verbindung zum Socket, der Buffer, sowie der Indikator für die Beendigung der Anwendung durch den Nutzenden per Referenz übergeben.
+
+== Parser
+Der Parser nimmt sich jeweils eine Zeile aus dem Socket und parst deren Kanal und ggf. Wert in ein QtRoboEvent. Zu Beginn wurde dieser Parser als Zustandsautomat umgesetzt. Dieser bietet sich an, solange Eventtypen nur durch ihre Syntax unterscheidbar sind. Mit der Einführung der Präfixe pro Eventtyp ist diese Unterscheidung anhand der ersten Buchstaben möglich. Je nach Eventtyp wird mit einem regulären Ausdruck der Kanal und der neue Wert geparst. Hat der Eventtyp weder Kanal noch Wert, handelt es sich um den MODE_CMD bzw. den SUB_CMD Eventtyp. In diesem Fall bleiben wird nur der EventTyp im QtRoboEvent hinterlegt.

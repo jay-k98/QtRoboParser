@@ -1,0 +1,45 @@
+:author: Klock, Jonas; Krämer, Desmond; Fernau, Jan
+:email: jokl0009@stud.hs-kl.de; dekr0012@stud.hs-kl.de; jafe0006@stud.hs-kl.de
+:date: {docdate}
+:revision: 0.0.1
+
+= Verwendung
+
+== Zweck des Dokuments
+Dies ist eine Anleitung wie das Kommandozeilentool QtRoboToSumD zu verwenden ist. Außerdem wird kurz die interne Funktionsweise dargestellt.
+
+== Voraussetzungen
+Die Applikation nutzt Unix Domain Sockets, weshalb sie nur unter Linux Distributionen ausführbar ist. Unix Domain Sockets sind auch unter Windows verfügbar, allerdings ist die Anwendung nur unter Arch Linux getestet und keine Portierung vorhanden.
+
+QtRobo muss zum Senden von Events verwendet werden.
+
+== Bauen der Applikation
+Voraussetzung zum Bauen der Applikation ist die Installation von make zusammen mit einem {cpp} Compiler. Das Projekt enthält ein Makefile. Dieses beschreibt die zum Bauen der Applikation benötigten Schritte für den verwendeten {cpp} Compiler. Solange make installiert ist, ermöglicht das Ausführen des Kommandos make im ./src Verzeichnis des Projekts auf dem Terminal die Erstellung der verschiedenen Object Dateien (.o) und das anschließende linken zur QtRoboToSumD executable.
+
+== Funktionsweise
+QtRoboToSumD erstellt einen Unix Domain Socket und wartet auf eine Verbindung von QtRobo. Sobald eine Zeile auf dem Socket übertragen wird, parst QtRoboToSumD diese in ein Event, welches den internen mit 0 für proportionale und false für binäre Kanäle initialisierten Buffer verändert. Jeder Name eines Controls in QtRobo muss deshalb dem folgenden Schema entsprechen:
+
+[Präfix][Name][Kanal]
+
+// Bild von eventName in QtRobo
+
+Die Werte des Buffers werden periodisch alle 10ms über das sumD Protokoll versendet. Da nicht alle Werte des Buffers in ein Event Frame passen, sendet die Anwendung die Teile des Buffers in gleich großen Abschnitten. Die folgende Abbildung zeigt den beschriebenen Ablauf:
+
+// image einfügen
+
+== Starten der Anwendung
+QtRoboToSumD ist eine Kommandozeilenanwendung. Sie wird deshalb auf dem Terminal über den Befehl ./QtRoboToSumD gestartet. Die Anwendung muss zum Starten die in QtRobo für die einzelnen Controls verwendeten Präfixe übergeben bekommen. Außerdem ist der Pfad unter dem der Unix Domain Socket angelegt werden soll konfigurierbar.
+
+Die genaue Syntax des Aufrufs kann mit ./QtRoboToSumD -h|--help angezeigt werden.
+
+Danach wartet die Anwendung auf die Verbindung eines Clients. In QtRobo muss deshalb als nächstes die Connection mit dem übergebenen Socketnamen eingerichtet werden. Angelegte Controls, die dem o.g. Namensschema entsprechen und das übergebene Präfix verwenden, führen bei Veränderung ihres Wertes im Spielmodus von QtRobo zur Übertragung an den in QtRoboToSumD erstellten Socket.
+
+*Achtung:* QtRobo sendet bei zu langen Eventnamen unlesbare Informationen an den Socket. Präfixe und Namen sollten entsprechend kurz gewählt werden.
+
+Auf dem Terminal in dem QtRoboToSumD gestartet wurde, sollten anschließend sumD Event Frames geschrieben werden. Sollte etwas nicht funktioniert haben, gibt die Anwendung eine Fehlerbeschreibung auf dem Standard Error Output aus.
+
+== Ende der Verbindung durch den Client
+Sobald der verbundene Client die Verbindung trennt, wartet QtRoboToSumD auf eine erneute Verbindung eines Clients.
+
+== Beenden der Anwendung
+Die Anwendung kann jeder Zeit mit Ctrl+C beendet werden. Sollte der bestehende Unix domain socket nicht gelöscht werden, kann dies auf dem Terminal mit rm [SocketName] manuell erledigt werden.
