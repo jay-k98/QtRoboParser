@@ -1,6 +1,7 @@
 #include "Sender.h"
 #include <iostream>
 #include <bitset>
+#include <unistd.h>
 
 void Sender::send(const std::array<uint8_t, 41> eventFrame, bool debug)
 {
@@ -12,8 +13,7 @@ void Sender::send(const std::array<uint8_t, 41> eventFrame, bool debug)
         }
         else
         {
-            std::bitset<8> bits(i);
-            std::cout << bits;
+            write(STDOUT_FILENO, &eventFrame[0], 41);
         }
     }
 }
