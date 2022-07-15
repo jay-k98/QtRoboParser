@@ -14,7 +14,7 @@ ReceiverThread ReceiverThread::operator()()
         
         SocketReadErr readReturn = m_SocketConnection.readToBuffer(line);
 
-        // Socket has O_NONBLOCKING set -> is non-blocking -> only react if data was read
+        // Socket has O_NONBLOCK set -> is non-blocking -> only react if data was read
         if (SocketReadErr::DATA_READ == readReturn)
         {
             QtRoboEvent event = m_Parser.parseToQtRoboEvent(line);
